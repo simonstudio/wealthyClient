@@ -1,10 +1,17 @@
 import React from "react"
+import { connect } from 'react-redux';
+import { ToastContainer, toast } from 'react-toastify';
+import { setToast, notify } from "./store/toast";
 import Header from './Header';
 import Home from './Home';
 import './App.scss';
 import Button from "./com/Button";
 
 import chains from "./chains"
+import Signin from "./Signin";
+import { connectWeb3 } from "./store/web3Store";
+
+import 'react-toastify/dist/ReactToastify.css';
 
 
 class App extends React.Component {
@@ -406,7 +413,7 @@ class App extends React.Component {
             <div class="row">
               <div class="col-12 col-sm-10 offset-sm-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
                 <a href="https://vimeo.com/45830194" class="video__btn">
-                  <img src="img/play.svg" style={{"width": "36px"}}/>
+                  <img src="img/play.svg" style={{ "width": "36px" }} />
                 </a>
                 <h4 class="video__title">How it Works?</h4>
                 <p class="video__text">Various versions have evolved over the years, sometimes by accident, sometimes on
@@ -568,22 +575,22 @@ class App extends React.Component {
                   <ul class="team__social">
                     <li>
                       <a href="#" class="ld">
-                        <img src="img/ld.svg" style={{"width": "33px"}} />
+                        <img src="img/ld.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="fb">
-                        <img src="img/fb.svg" style={{"height": "33px"}} />
+                        <img src="img/fb.svg" style={{ "height": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/tw.svg" style={{"width": "33px"}} />
+                        <img src="img/tw.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/ig.svg" style={{"width": "33px"}} />
+                        <img src="img/ig.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                   </ul>
@@ -602,22 +609,22 @@ class App extends React.Component {
                   <ul class="team__social">
                     <li>
                       <a href="#" class="ld">
-                        <img src="img/ld.svg" style={{"width": "33px"}} />
+                        <img src="img/ld.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="fb">
-                        <img src="img/fb.svg" style={{"height": "33px"}} />
+                        <img src="img/fb.svg" style={{ "height": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/tw.svg" style={{"width": "33px"}} />
+                        <img src="img/tw.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/ig.svg" style={{"width": "33px"}} />
+                        <img src="img/ig.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                   </ul>
@@ -636,22 +643,22 @@ class App extends React.Component {
                   <ul class="team__social">
                     <li>
                       <a href="#" class="ld">
-                        <img src="img/ld.svg" style={{"width": "33px"}} />
+                        <img src="img/ld.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="fb">
-                        <img src="img/fb.svg" style={{"height": "33px"}} />
+                        <img src="img/fb.svg" style={{ "height": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/tw.svg" style={{"width": "33px"}} />
+                        <img src="img/tw.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/ig.svg" style={{"width": "33px"}} />
+                        <img src="img/ig.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                   </ul>
@@ -688,22 +695,22 @@ class App extends React.Component {
                   <ul class="team__social">
                     <li>
                       <a href="#" class="ld">
-                        <img src="img/ld.svg" style={{"width": "33px"}} />
+                        <img src="img/ld.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="fb">
-                        <img src="img/fb.svg" style={{"height": "33px"}} />
+                        <img src="img/fb.svg" style={{ "height": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/tw.svg" style={{"width": "33px"}} />
+                        <img src="img/tw.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/ig.svg" style={{"width": "33px"}} />
+                        <img src="img/ig.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                   </ul>
@@ -722,22 +729,22 @@ class App extends React.Component {
                   <ul class="team__social">
                     <li>
                       <a href="#" class="ld">
-                        <img src="img/ld.svg" style={{"width": "33px"}} />
+                        <img src="img/ld.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="fb">
-                        <img src="img/fb.svg" style={{"height": "33px"}} />
+                        <img src="img/fb.svg" style={{ "height": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/tw.svg" style={{"width": "33px"}} />
+                        <img src="img/tw.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/ig.svg" style={{"width": "33px"}} />
+                        <img src="img/ig.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                   </ul>
@@ -756,22 +763,22 @@ class App extends React.Component {
                   <ul class="team__social">
                     <li>
                       <a href="#" class="ld">
-                        <img src="img/ld.svg" style={{"width": "33px"}} />
+                        <img src="img/ld.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="fb">
-                        <img src="img/fb.svg" style={{"height": "33px"}} />
+                        <img src="img/fb.svg" style={{ "height": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/tw.svg" style={{"width": "33px"}} />
+                        <img src="img/tw.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/ig.svg" style={{"width": "33px"}} />
+                        <img src="img/ig.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                   </ul>
@@ -790,22 +797,22 @@ class App extends React.Component {
                   <ul class="team__social">
                     <li>
                       <a href="#" class="ld">
-                        <img src="img/ld.svg" style={{"width": "33px"}} />
+                        <img src="img/ld.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="fb">
-                        <img src="img/fb.svg" style={{"height": "33px"}} />
+                        <img src="img/fb.svg" style={{ "height": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/tw.svg" style={{"width": "33px"}} />
+                        <img src="img/tw.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                     <li>
                       <a href="#" class="tw">
-                        <img src="img/ig.svg" style={{"width": "33px"}} />
+                        <img src="img/ig.svg" style={{ "width": "33px" }} />
                       </a>
                     </li>
                   </ul>
@@ -937,7 +944,7 @@ class App extends React.Component {
                       <button type="button" data-toggle="collapse" data-target="#collapse1" aria-expanded="false"
                         aria-controls="collapse1">
                         <span>When will BuyCoin be listed on exchanges?</span>
-                        <img src="img/plus.svg" style={{"width": "33px"}}/>
+                        <img src="img/plus.svg" style={{ "width": "33px" }} />
                       </button>
                     </div>
 
@@ -955,7 +962,7 @@ class App extends React.Component {
                       <button class="collapsed" type="button" data-toggle="collapse" data-target="#collapse2"
                         aria-expanded="false" aria-controls="collapse2">
                         <span>Can I make payments directly from an exchange?</span>
-                        <img src="img/plus.svg" style={{"width": "33px"}}/>
+                        <img src="img/plus.svg" style={{ "width": "33px" }} />
                       </button>
                     </div>
 
@@ -972,7 +979,7 @@ class App extends React.Component {
                       <button class="collapsed" type="button" data-toggle="collapse" data-target="#collapse3"
                         aria-expanded="false" aria-controls="collapse3">
                         <span>What cryptocurrencies can I use to purchase?</span>
-                        <img src="img/plus.svg" style={{"width": "33px"}}/>
+                        <img src="img/plus.svg" style={{ "width": "33px" }} />
                       </button>
                     </div>
 
@@ -991,7 +998,7 @@ class App extends React.Component {
                       <button class="collapsed" type="button" data-toggle="collapse" data-target="#collapse4"
                         aria-expanded="false" aria-controls="collapse4">
                         <span>How can I create a crypto-wallet?</span>
-                        <img src="img/plus.svg" style={{"width": "33px"}}/>
+                        <img src="img/plus.svg" style={{ "width": "33px" }} />
                       </button>
                     </div>
 
@@ -1008,7 +1015,7 @@ class App extends React.Component {
                       <button class="collapsed" type="button" data-toggle="collapse" data-target="#collapse5"
                         aria-expanded="false" aria-controls="collapse5">
                         <span>How do I benefit from the ICO Token?</span>
-                        <img src="img/plus.svg" style={{"width": "33px"}}/>
+                        <img src="img/plus.svg" style={{ "width": "33px" }} />
                       </button>
                     </div>
 
@@ -1025,7 +1032,7 @@ class App extends React.Component {
                       <button class="collapsed" type="button" data-toggle="collapse" data-target="#collapse6"
                         aria-expanded="false" aria-controls="collapse6">
                         <span>How can I participate in the ICO Token sale?</span>
-                        <img src="img/plus.svg" style={{"width": "33px"}}/>
+                        <img src="img/plus.svg" style={{ "width": "33px" }} />
                       </button>
                     </div>
 
@@ -1060,26 +1067,26 @@ class App extends React.Component {
                   <ul class="contacts__list">
                     <li>
                       <span>
-                        <img src="img/phone.svg" style={{"width": "33px"}}/>
+                        <img src="img/phone.svg" style={{ "width": "33px" }} />
                       </span>
                       <p>The BuyCoin Company, LLC <br />
                         32 Barnard St. #145, GA 80634</p>
                     </li>
                     <li>
                       <span>
-                        <img src="img/clock.svg" style={{"width": "33px"}}/>
+                        <img src="img/clock.svg" style={{ "width": "33px" }} />
                       </span>
                       <p>Mon - Fri: <br />08:00 - 19:00</p>
                     </li>
                     <li>
                       <span>
-                        <img src="img/mail.svg"  style={{"width": "33px"}}/>
+                        <img src="img/mail.svg" style={{ "width": "33px" }} />
                       </span>
                       <a href="mailto:support@buycoin.template">support@BuyCoin.template</a>
                     </li>
                     <li>
                       <span>
-                        <img src="img/phone.svg" style={{"width": "33px"}}/>
+                        <img src="img/phone.svg" style={{ "width": "33px" }} />
                       </span>
                       <a href="tel:88002345678">8 800 234-56-78</a>
                     </li>
@@ -1178,7 +1185,7 @@ class App extends React.Component {
               <div class="col-12">
                 <form action="#" class="subscribe">
                   <input type="text" class="subscribe__input" placeholder="Enter your e-mail address" />
-                  <button type="button" class="subscribe__btn"><img src="img/subcribe.svg" style={{"width": "33px"}} /></button>
+                  <button type="button" class="subscribe__btn"><img src="img/subcribe.svg" style={{ "width": "33px" }} /></button>
                 </form>
               </div>
 
@@ -1187,22 +1194,22 @@ class App extends React.Component {
                 <ul class="footer__social">
                   <li>
                     <a href="#" class="in">
-                      <img src="img/ld.svg" style={{"width": "33px"}} />
+                      <img src="img/ld.svg" style={{ "width": "33px" }} />
                     </a>
                   </li>
                   <li>
                     <a href="#" class="fb">
-                      <img src="img/fb.svg" style={{"height": "33px"}} />
+                      <img src="img/fb.svg" style={{ "height": "33px" }} />
                     </a>
                   </li>
                   <li>
                     <a href="#" class="inst">
-                      <img src="img/ig.svg" style={{"width": "33px"}} />
+                      <img src="img/ig.svg" style={{ "width": "33px" }} />
                     </a>
                   </li>
                   <li>
                     <a href="#" class="tw">
-                      <img src="img/tw.svg" style={{"width": "33px"}} />
+                      <img src="img/tw.svg" style={{ "width": "33px" }} />
                     </a>
                   </li>
                 </ul>
@@ -1296,8 +1303,8 @@ class App extends React.Component {
           </div>
 
           <div class="share">
-            <a href="#" class="share__link share__link--fb"><img src="img/share.svg" style={{"width": "33px"}} /></a>
-            <a href="#" class="share__link share__link--tw"><img src="img/tweet.svg" style={{"width": "33px"}} /></a>
+            <a href="#" class="share__link share__link--fb"><img src="img/share.svg" style={{ "width": "33px" }} /></a>
+            <a href="#" class="share__link share__link--tw"><img src="img/tweet.svg" style={{ "width": "33px" }} /></a>
           </div>
         </div>
         {/* end article */}
@@ -1377,10 +1384,11 @@ class App extends React.Component {
         </div>
         {/* end privacy */}
 
+        <Signin />
 
         {/* sign up */}
         <div id="signup" class="zoom-anim-dialog mfp-hide modal">
-          <button class="modal__close" type="button"><img src="img/share.svg" style={{"width": "33px"}} /></button>
+          <button class="modal__close" type="button"><img src="img/share.svg" style={{ "width": "33px" }} /></button>
 
           <h6 class="modal__title">Sign Up</h6>
 
@@ -1417,8 +1425,34 @@ class App extends React.Component {
           <span class="modal__text">We will send a password to your Email</span>
         </div>
         {/* end forgot */}
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+        {/* Same as */}
+        <ToastContainer />
       </>
     );
   }
 }
-export default App;
+
+
+const mapStateToProps = (state, ownProps) => ({
+  web3: state.web3Store.web3,
+  accounts: state.web3Store.accounts,
+  // contract: state.Contract.contract,
+  // owner: state.Contract.owner,
+});
+
+export default connect(mapStateToProps, {
+  setToast, notify,
+  connectWeb3: connectWeb3,
+  // connectContract: connectContract,
+})(App);

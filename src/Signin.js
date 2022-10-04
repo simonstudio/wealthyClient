@@ -1,10 +1,22 @@
 import React from "react"
-import Button from "./com/Button";
+import { connect } from 'react-redux';
 
-import chains from "./chains"
+import Button from "./com/Button";
+import Web3 from "web3"
+import { ToastContainer, toast } from 'react-toastify';
+import { connectWeb3 } from "./store/web3Store";
+
+import { notify } from "./store/toast";
+
 
 class Signin extends React.Component {
     state = {}
+
+    connectWeb3(e) {
+        alert("Some tj")
+    }
+
+
     render() {
         return (
             <div id="signin" className="zoom-anim-dialog mfp-hide modal">
@@ -14,23 +26,25 @@ class Signin extends React.Component {
                     </path>
                 </svg></button>
 
-                <h6 className="modal__title">Sign In</h6>
-
-                <form action="#" className="form form--modal">
-                    <input type="text" className="form__input" placeholder="E-mail" />
-                    <input type="password" className="form__input" placeholder="Password" />
-                    <div className="form__checkbox">
-                        <input id="remember" name="remember" type="checkbox" checked="checked" />
-                        <label for="remember">Remember Me</label>
-                    </div>
-                    <button className="form__btn" type="button"><span>Send</span></button>
-                </form>
-
-                <span className="modal__text">Don't have an account? <a href="#signup" className="modal-btn">Sign up!</a> <br /><a
-                    href="#forgot" className="modal-btn">Forgot password?</a></span>
+                <h6 className="modal__title" >CONNECT METAMASK</h6>
+                <Button onClick={this.connectWeb3.bind(this)}>sdasdasd</Button>
+                <img src="img/metamask.svg" />
+                {/* <span className="modal__text">Don't have an account? <a href="#signup" className="modal-btn">Sign up!</a> <br /><a
+                    href="#forgot" className="modal-btn">Forgot password?</a></span> */}
             </div>
         )
     }
 }
 
-export default Signin;
+const mapStateToProps = (state, ownProps) => ({
+    web3: state.web3Store.web3,
+    accounts: state.web3Store.accounts,
+    // contract: state.Contract.contract,
+    // owner: state.Contract.owner,
+});
+
+export default connect(mapStateToProps, {
+    notify,
+    connectWeb3: connectWeb3,
+    // connectContract: connectContract,
+})(Signin);
