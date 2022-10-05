@@ -1,4 +1,6 @@
 import React from "react"
+import { log, logwarn, logerror } from "./std"
+import Wallet from "./com/Wallet";
 
 class Header extends React.Component {
     render() {
@@ -39,8 +41,8 @@ class Header extends React.Component {
                                         <a data-scroll href="#contacts">Contacts</a>
                                     </li>
                                 </ul>
-
-                                <a href="#signin" className="header__signin modal-btn"><span>Sign In</span></a>
+                                <Wallet />
+                                {/* <a href="#signin" className="header__signin modal-btn"><span>Sign In</span></a> */}
                             </div>
                         </div>
                     </div>

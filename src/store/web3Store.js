@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import Web3 from "web3";
 import { notify } from "./toast"
+import { log, logwarn, logerror } from "../std"
 
 const dev = {
     TEST: 'TEST',
@@ -87,7 +88,6 @@ export const CHAINS = {
 export const connectWeb3 = createAsyncThunk(
     'connectWeb3',
     async (args, thunkAPI) => {
-        // console.log('connecting Web3', args)
         // Wait for loading completion to avoid race conditions with web3 injection timing.
         // Modern dapp browsers...
         let web3 = null;
@@ -104,7 +104,7 @@ export const connectWeb3 = createAsyncThunk(
             else if (window.web3) {
                 // Use Mist/MetaMask's provider.
                 web3 = window.web3;
-                // console.log("Injected web3 detected.");
+                // log("Injected web3 detected.");
             }
             // Fallback to localhost; use dev console port by default...
             else {
@@ -112,33 +112,34 @@ export const connectWeb3 = createAsyncThunk(
                     "http://127.0.0.1:8545"
                 );
                 web3 = new Web3(provider);
-                // console.log("No web3 instance injected, using Local web3.");
+                // log("No web3 instance injected, using Local web3.");
             }
             accounts = await web3.eth.getAccounts();
             chainId = await web3.eth.getChainId()
 
-            // console.log('Web3 is: ', web3);
+            // log('Web3 is: ', web3);
         } catch (error) {
-            console.error('error ', error)
+            throw error;
         }
         window.web3 = web3;
         return { web3, accounts, chainId };
     }
 )
+
 let _switchChain;
 export const switchChain = createAsyncThunk(
     'switchChain',
     _switchChain = async (args, thunkAPI) => {
         let chainId = parseInt(args);
         if (chainId === 5777) chainId = 1337;
-        // console.log('switchChain', chainId, notify("ádasd"));
+        // log('switchChain', chainId, notify("ádasd"));
         let web3 = thunkAPI.getState().web3Store.web3;
         if (chainId && chainId !== parseInt(window.ethereum.networkVersion)) {
             return window.ethereum.request({
                 method: 'wallet_switchEthereumChain',
                 params: [{ chainId: web3.utils.toHex(chainId) }]
             }).then(r => {
-                console.log("switchEthereumChain success", r);
+                log("switchEthereumChain success", r);
                 return window.ethereum.networkVersion;
             }).catch(error => {
                 // if chain was not added, add chain
@@ -181,7 +182,7 @@ export const web3Slice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(connectWeb3.fulfilled, (state, action) => {
-            console.log('conected Web3', action.payload)
+            log('conected Web3', action.payload)
             state.web3 = action.payload.web3;
             if (action.payload.accounts.length > 0 && CHAINS[action.payload.chainId]) {
                 state.accounts = action.payload.accounts;
@@ -189,8 +190,12 @@ export const web3Slice = createSlice({
                 state.chainName = CHAINS[action.payload.chainId].chainName;
             };
         });
+        builder.addCase(connectWeb3.rejected, (state, action) => {
+            // logerror("connectWeb3 error: ", state, action)
+        });
+
         builder.addCase(switchChain.fulfilled, (state, action) => {
-            console.log('switchChain return', action.payload)
+            log('switchChain return', action.payload)
         })
 
     },
@@ -198,6 +203,6 @@ export const web3Slice = createSlice({
 
 
 export const { updateAccounts } = web3Slice.actions;
-// console.log("actions", web3Slice)
+// log("actions", web3Slice)
 
 export default web3Slice.reducer;
