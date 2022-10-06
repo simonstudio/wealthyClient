@@ -7,7 +7,6 @@ import Home from './Home';
 import './App.scss';
 import Button from "./com/Button";
 
-import chains from "./chains"
 import Signin from "./Signin";
 import { connectWeb3 } from "./store/web3Store";
 

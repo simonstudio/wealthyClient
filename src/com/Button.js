@@ -9,8 +9,7 @@ class Button extends React.Component {
         return (
             <a href={href} style={styles.Button} className="home__btn" {...this.props}>
                 {icon ? (<span style={{ "width": "40px" }}><img src={icon} /></span>) : ""}
-                <span>{text}</span>
-                {children}
+                <span>{text}{children}</span>
             </a>
         )
     }

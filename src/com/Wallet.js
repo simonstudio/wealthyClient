@@ -18,6 +18,11 @@ class Wallet extends React.Component {
             this.setState({ text: "Install" })
         }
     }
+
+    componentDidUpdate() {
+        log('componentDidUpdate')
+    }
+
     connectWeb3() {
         if (!window.ethereum || !window.ethereum.isMetaMask) {
             toast.error(<>Please install <a href='https://metamask.io/' target="_blank">Metamask</a></>);
@@ -34,23 +39,19 @@ class Wallet extends React.Component {
                             toast.error(r.error.message)
                         } else {
                             toast.success("connected web3")
-                            this.setState({ text: "0x..." + this.props.accounts[0].substring(this.props.accounts[0].length - 3) })
+                            this.setState({ text: "" })
                         }
                     }).catch(err => toast.error(err.message))
             }
         }
     }
-    clicked(e) {
-        this.connectWeb3()
-    }
 
     render() {
-
-
         const { text } = this.state;
-        const { web3 } = this.props;
+        let { accounts } = this.props;
+        let account = accounts.length > 0 ? "0x..." + accounts[0].substring(accounts[0].length - 3) : text;
         return (
-            <Button icon="img/metamask.svg" onClick={this.clicked.bind(this)}>{text}</Button>
+            <Button icon="img/metamask.svg" onClick={this.connectWeb3.bind(this)}>{account} </Button>
         )
     }
 }

@@ -74,6 +74,17 @@ export const CHAINS = {
         blockExplorerUrls: ['https://etherscan.io'],
         dev: dev.MAINNET
     },
+    5: {
+        id: 1,
+        nativeCurrency: {
+            name: 'Ethereum', decimals: 18, symbol: 'ETH'
+        },
+        chainId: Web3.utils.toHex(5),
+        rpcUrls: ['https://goerli.infura.io/v3/'],
+        chainName: 'Goerli',
+        blockExplorerUrls: ['https://goerli.etherscan.io'],
+        dev: dev.TEST
+    },
     getParamsById: (id) => {
         //copy params
         let params = { ...Object.values(CHAINS).find(item => item.id === id) };
