@@ -19,10 +19,6 @@ class Wallet extends React.Component {
         }
     }
 
-    componentDidUpdate() {
-        log('componentDidUpdate')
-    }
-
     connectWeb3() {
         if (!window.ethereum || !window.ethereum.isMetaMask) {
             toast.error(<>Please install <a href='https://metamask.io/' target="_blank">Metamask</a></>);

