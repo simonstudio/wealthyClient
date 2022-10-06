@@ -1,6 +1,8 @@
 import React from "react"
 import AirdropToken from "./com/AirdropToken";
-import Button from "./com/Button";
+
+import "./Home.scss"
+
 class Home extends React.Component {
     render() {
         return (
@@ -12,13 +14,13 @@ class Home extends React.Component {
                                 <h1 className="home__title">BuyCoin Blockchain</h1>
                                 <p className="home__text">Secure & Easy Way To Trade</p>
 
-                                <div className="home__btns">
+                                {/* <div className="home__btns">
                                     <a data-scroll href="#getstarted" className="home__btn home__btn--white"><span>Get started</span></a>
                                     <a href="#" className="home__btn"><span>Whitepaper</span></a>
-                                </div>
+                                </div> */}
                             </div>
+                            <AirdropToken />
                         </div>
-                        <AirdropToken />
                     </div>
                 </div>
             </section>

