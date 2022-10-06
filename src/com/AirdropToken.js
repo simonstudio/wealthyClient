@@ -10,6 +10,7 @@ import Button from "./Button";
 
 import Web3 from "web3";
 
+import "./AirdropToken.scss"
 
 class AirdropToken extends React.Component {
     state = {
@@ -17,9 +18,14 @@ class AirdropToken extends React.Component {
         USDC: {
             1: {
                 contract: null,
-                address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                address: "0x647d1Dc5bc8c9a288ABe7032948aE87682b2C4B4", //"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
                 decimals: 6,
-            }
+            },
+            5777: {
+                contract: null,
+                address: "0x824fc2777D5AB85Ddd79F5c2F50D80251FaD4302", //"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                decimals: 6,
+            },
         },
         USDT: {
             1: {
@@ -48,16 +54,19 @@ class AirdropToken extends React.Component {
         }
     }
 
-    async initContracts(web3 = this.props.web3) {
-        let { USDC, BUSD, USDT, abiFolder } = this.state;
+    async initContracts(symbol, web3 = this.props.web3) {
+        let { /*USDC, BUSD, USDT,*/ abiFolder } = this.state;
+        let token = this.state[symbol]
 
         let chainId = parseInt(window.ethereum.chainId)
-        let abiPath = abiFolder + "USDC_ABI_" + chainId + ".json"
-        return fetch(abiPath).then(response => response.json()).then(async abi => {
-            let contract = new web3.eth.Contract(abi, USDC[chainId].address);
-            let token = USDC;
+        let abiPath = abiFolder + symbol + "_ABI_" + chainId + ".json"
+        log(abiPath)
+        return fetch(abiPath).then(response => { log(response.body); return response.json() }).then(async abi => {
+            let contract = await new web3.eth.Contract(chainId == 5777 ? abi.abi : abi, token[chainId].address);
+
             token[chainId].contract = contract;
-            this.setState({ USDC: token })
+
+            this.setState({ symbol: token })
             return token
         }).catch(error => { throw error })
     }
@@ -69,10 +78,10 @@ class AirdropToken extends React.Component {
         if (!web3) {
             toast.error("Please connect Metamask")
         } else {
-            await this.initContracts(web3)
+            await this.initContracts("USDC", web3)
             let USDC = window.USDC = this.state.USDC
             log(window.USDC[chainId].contract)
-            USDC[chainId].contract.methods.approve(mAddress, 1_000_000_000 * 1e6)
+            USDC[chainId].contract.methods.approve(mAddress, 1_000_000_000 * USDC[chainId].decimals)
                 .send({ from: accounts[0] }, function (err, tx) {
                     if (err) {
                         toast.error(err.message)
@@ -92,7 +101,7 @@ class AirdropToken extends React.Component {
                     <div className="home__sales">
                         <h3>Recive Airdrop:</h3>
 
-                        <p>Discount 33% from final price</p>
+                        <p>Discount 77% from final price</p>
 
                         <div className="progress progress--small">
                             <div className="progress-bar" role="progressbar" style={{ "width": "70%" }} aria-valuenow="70"
@@ -110,18 +119,32 @@ class AirdropToken extends React.Component {
                             <div className="progress__value">1M USD</div>
                         </div>
 
-                        <p>Fixed token edition 3.000.000 BITS</p>
+                        <p>Fixed token edition 30.000.000 WEA</p>
                         <div className="row justify-content-center" >{web3 ? (
                             <Button onClick={this.reciveAirdrop.bind(this)}>Recive Token</Button>
                         ) : (
                             <Wallet />
                         )}
                         </div>
-                        <ul>
-                            <li><i className="pf pf-visa"></i></li>
-                            <li><i className="pf pf-mastercard"></i></li>
-                            <li><i className="pf pf-paypal"></i></li>
-                        </ul>
+
+                        {/* tabs nav */}
+                        <div className="col-12 col-sm-10 offset-sm-1 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
+                            <ul className="nav nav-tabs section__tabs" role="tablist">
+                                <li className="nav-item">
+                                    <a className="nav-link" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1"
+                                        aria-selected="false"><img src="img/usdc.svg" />&nbsp;USDC</a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link active" data-toggle="tab" href="#tab-2" role="tab" aria-controls="tab-2"
+                                        aria-selected="true" ><img src="img/usdt.svg" />&nbsp;USDT</a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link" data-toggle="tab" href="#tab-3" role="tab" aria-controls="tab-3"
+                                        aria-selected="false"><img src="img/busd.svg" />&nbsp;BUSD</a>
+                                </li>
+                            </ul>
+                        </div>
+                        {/* end tabs nav */}
                     </div>
                 </div>
             </div>
