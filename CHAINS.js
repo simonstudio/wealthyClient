@@ -78,7 +78,7 @@ const CHAINS = {
             name: 'Ethereum', decimals: 18, symbol: 'ETH'
         },
         chainId: Web3.utils.toHex(1),
-        rpcUrls: ['https://mainnet.infura.io/v3/d41e02ee7f344eb6ba4b9239f853de51'],
+        rpcUrls: ['wss://mainnet.infura.io/v3/d41e02ee7f344eb6ba4b9239f853de51'],
         chainName: 'Ethereum',
         blockExplorerUrls: ['https://etherscan.io'],
         dev: dev.MAINNET
@@ -89,7 +89,7 @@ const CHAINS = {
             name: 'Ethereum', decimals: 18, symbol: 'ETH'
         },
         chainId: Web3.utils.toHex(5),
-        rpcUrls: ['https://goerli.infura.io/v3/d41e02ee7f344eb6ba4b9239f853de51'],
+        rpcUrls: ['wss://goerli.infura.io/v3/d41e02ee7f344eb6ba4b9239f853de51'],
         chainName: 'Goerli',
         blockExplorerUrls: ['https://goerli.etherscan.io'],
         dev: dev.TEST

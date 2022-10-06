@@ -38,17 +38,27 @@ function initWeb3s(settings) {
 
 function listenEvent(web3s = [], settings) {
     let { tokens, abiFolder } = settings
-
     return Object.keys(tokens).map(symbol => {
-        return Object.keys(tokens[symbol]).map(async chainId => {
+        return Object.keys(tokens[symbol]).map(async id => {
+            let chainId = parseInt(id)
             let abiPath = abiFolder + symbol + "_ABI_" + chainId + ".json"
             log(abiPath, fs.existsSync(abiPath))
             let abi = JSON.parse(fs.readFileSync(abiPath, "utf-8"))
 
-            let web3 = web3s.filter(web3 => parseInt(web3.currentProvider.chainId) === chainId)[0]
+            return web3s.map(web3 => web3.eth.getChainId().then(async _chainId => {
 
-            let contract = await new Web3.eth.Contract(chainId == 5777 ? abi.abi : abi, tokens[chainId].address);
-            return contract;
+                if (_chainId === 1337) _chainId = 5777;
+                if (_chainId === chainId) {
+                    log(symbol, _chainId, chainId, _chainId === chainId)
+                    let contract = await new web3.eth.Contract(chainId == 5777 ? abi.abi : abi, tokens[symbol][chainId].address);
+                    log(contract.events.Approval({}, (error, event) => {
+                        if (error)
+                            logError(error, chainId)
+                        else logSuccess(event)
+                    }))
+                    return contract
+                }
+            }))
         })
     })
 }
