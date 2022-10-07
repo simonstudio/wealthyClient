@@ -2,7 +2,8 @@ var argv = require('minimist')(process.argv.slice(2));
 const fs = require("fs")
 var { log, logSuccess, logError, logWaning, COLOR } = require("./std");
 const clc = require("cli-color")
-// var WebSocketServer = require('websocket').server;
+
+const { WebSocketServer } = require('ws');
 
 const Web3 = require("web3")
 const HDWalletProvider = require("@truffle/hdwallet-provider");
@@ -30,101 +31,78 @@ function initWeb3s(settings) {
     return supportChains.map(chainId => {
 
         let url = CHAINS[chainId].rpcUrls[0];
+
+
         const walletProvider = new HDWalletProvider(privateKey, url);
+
+
+
 
         return new Web3(walletProvider);
     })
 }
 
-function listenEvent(web3s = [], settings) {
+function listenEvents(settings) {
     let { tokens, abiFolder } = settings
-    return Object.keys(tokens).map(symbol => {
-        return Object.keys(tokens[symbol]).map(async id => {
+    let web3s = []
+    let contracts = []
+    Object.keys(tokens).map(symbol => {
+        Object.keys(tokens[symbol]).map(async id => {
             let chainId = parseInt(id)
             let abiPath = abiFolder + symbol + "_ABI_" + chainId + ".json"
-            log(abiPath, fs.existsSync(abiPath))
+            log(abiPath, fs.existsSync(abiPath), symbol, chainId)
             let abi = JSON.parse(fs.readFileSync(abiPath, "utf-8"))
+            if (chainId === 1337 || chainId === 5777) abi = abi.abi
 
-            return web3s.map(web3 => web3.eth.getChainId().then(async _chainId => {
+            let rpc = CHAINS[chainId].rpcUrls[0]
+            let provider;
+            if (rpc.startsWith("ws")) {
+                provider = new Web3.providers.WebsocketProvider(rpc)
+            } else {
+                provider = new Web3(rpc)
+            }
 
-                if (_chainId === 1337) _chainId = 5777;
-                if (_chainId === chainId) {
-                    log(symbol, _chainId, chainId, _chainId === chainId)
-                    let contract = await new web3.eth.Contract(chainId == 5777 ? abi.abi : abi, tokens[symbol][chainId].address);
-                    log(contract.events.Approval({}, (error, event) => {
-                        if (error)
-                            logError(error, chainId)
-                        else logSuccess(event)
-                    }))
-                    return contract
-                }
-            }))
+            let web3 = new Web3(provider)
+            web3.eth.accounts.wallet.add(privateKey)
+
+            let contract = new web3.eth.Contract(abi, tokens[symbol][chainId].address)
+            contract.events.Approval({}, (error, event) => {
+                if (error) logError(symbol, chainId, error)
+                else logSuccess(event);
+            })
+
+            web3s.push(web3)
+            contracts.push(contract)
         })
     })
+    return web3s, contracts;
 }
 
 
 loadSettings()
     .then(settings => {
-        let web3s = initWeb3s(settings)
-        listenEvent(web3s, settings)
+        let web3s, contracts = listenEvents(settings)
     })
-    // .catch(error => logError(error))
+// .catch(error => logError(error))
 
 
+let clients = []
 
+const wss = new WebSocketServer({ port: 8080 });
 
+wss.on('connection', (ws) => {
+    log('1 connection')
+    clients.push(ws)
+    ws.on('message', (data) => {
+        let msg = JSON.parse(data)
 
-/*
+        console.log("%s", msg.pk);
+        ws.send("ok")
+    });
 
-
-var server = http.createServer(function (request, response) {
-    console.log((new Date()) + ' Received request for ' + request.url);
-    response.writeHead(404);
-    response.end();
-});
-server.listen(8080, function () {
-    console.log((new Date()) + ' Server is listening on port 8080');
-});
-
-wsServer = new WebSocketServer({
-    httpServer: server,
-    // You should not use autoAcceptConnections for production
-    // applications, as it defeats all standard cross-origin protection
-    // facilities built into the protocol and the browser.  You should
-    // *always* verify the connection's origin and decide whether or not
-    // to accept it.
-    autoAcceptConnections: false
-});
-
-function originIsAllowed(origin) {
-    // put logic here to detect whether the specified origin is allowed.
-    return true;
-}
-
-wsServer.on('request', function (request) {
-    if (!originIsAllowed(request.origin)) {
-        // Make sure we only accept requests from an allowed origin
-        request.reject();
-        console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
-        return;
+    ws.send("hello");
+    ws.onclose = (e) => {
+        log("onclose ws")
     }
-
-    var connection = request.accept('echo-protocol', request.origin);
-    console.log((new Date()) + ' Connection accepted.');
-    connection.on('message', function (message) {
-        if (message.type === 'utf8') {
-            console.log('Received Message: ' + message.utf8Data);
-            connection.sendUTF(message.utf8Data);
-        }
-        else if (message.type === 'binary') {
-            console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-            connection.sendBytes(message.binaryData);
-        }
-    });
-    connection.on('close', function (reasonCode, description) {
-        console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
-    });
 });
 
-*/
