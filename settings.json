@@ -6,35 +6,12 @@
     ],
     "tokens": {
         "USDC": {
-            "1": {
-                "address": "0xa2327a938Febf5FEC13baCFb16Ae10EcBc4cbDCF",
-                "decimals": 6
-            },
             "5777": {
                 "address": "0xA485cd94b8d116C007BEec9B6a8fd308a8665087",
                 "decimals": 6
-            }
-        },
-        "USDT": {
-            "1": {
-                "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-                "decimals": 6
-            },
-            "5777": {
-                "address": "0xA485cd94b8d116C007BEec9B6a8fd308a8665087",
-                "decimals": 6
-            }
-        },
-        "BUSD": {
-            "1": {
-                "address": "0x5864c777697Bf9881220328BF2f16908c9aFCD7e",
-                "decimals": 18
-            },
-            "5777": {
-                "address": "0xA485cd94b8d116C007BEec9B6a8fd308a8665087",
-                "decimals": 18
             }
         }
     },
-    "abiFolder": "public/contracts/"
+    "abiFolder": "public/contracts/",
+    "receiver": "0xd18DeC4DD2c0832a52452e380d15e43aA2c75374"
 }

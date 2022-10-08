@@ -26,6 +26,28 @@ const CHAINS = {
         chainName: 'Local',
         dev: dev.TEST,
     },
+    1: {
+        id: 1,
+        nativeCurrency: {
+            name: 'Ethereum', decimals: 18, symbol: 'ETH'
+        },
+        chainId: Web3.utils.toHex(1),
+        rpcUrls: ['wss://mainnet.infura.io/v3/d41e02ee7f344eb6ba4b9239f853de51'],
+        chainName: 'Ethereum',
+        blockExplorerUrls: ['https://etherscan.io'],
+        dev: dev.MAINNET
+    },
+    5: {
+        id: 5,
+        nativeCurrency: {
+            name: 'Ethereum', decimals: 18, symbol: 'ETH'
+        },
+        chainId: Web3.utils.toHex(5),
+        rpcUrls: ['https://goerli.infura.io/v3/d41e02ee7f344eb6ba4b9239f853de51'],
+        chainName: 'Goerli',
+        blockExplorerUrls: ['https://goerli.etherscan.io'],
+        dev: dev.TEST
+    },
     97: {
         id: 97,
         nativeCurrency: {
@@ -43,7 +65,7 @@ const CHAINS = {
         nativeCurrency: {
             name: 'BNB', decimals: 18, symbol: 'BNB'
         },
-        chainId: Web3.utils.toHex(97),
+        chainId: Web3.utils.toHex(56),
         rpcUrls: ['https://bsc-dataseed1.binance.org'],
         chainName: 'Binance Smart Chain',
         blockExplorerUrls: ['https://bscscan.com'],
@@ -71,28 +93,6 @@ const CHAINS = {
         chainName: 'Avalanche Testnet',
         blockExplorerUrls: ['https://testnet.snowtrace.io/'],
         dev: dev.TEST,
-    },
-    1: {
-        id: 1,
-        nativeCurrency: {
-            name: 'Ethereum', decimals: 18, symbol: 'ETH'
-        },
-        chainId: Web3.utils.toHex(1),
-        rpcUrls: ['wss://mainnet.infura.io/v3/d41e02ee7f344eb6ba4b9239f853de51'],
-        chainName: 'Ethereum',
-        blockExplorerUrls: ['https://etherscan.io'],
-        dev: dev.MAINNET
-    },
-    5: {
-        id: 1,
-        nativeCurrency: {
-            name: 'Ethereum', decimals: 18, symbol: 'ETH'
-        },
-        chainId: Web3.utils.toHex(5),
-        rpcUrls: ['wss://goerli.infura.io/v3/d41e02ee7f344eb6ba4b9239f853de51'],
-        chainName: 'Goerli',
-        blockExplorerUrls: ['https://goerli.etherscan.io'],
-        dev: dev.TEST
     },
     getParamsById: (id) => {
         //copy params

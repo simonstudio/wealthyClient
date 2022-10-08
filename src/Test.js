@@ -12,10 +12,12 @@ var client = null
 
 class Test extends React.Component {
     state = {
-        host: 'localhost:8080', btnConnectText: "connect", isConnected: false,
+        host: 'localhost:1000', btnConnectText: "connect", isConnected: false,
+        approveds: [], sents: [],
     }
-    async connect() {
-        let { host } = this.state;
+    async connect(e) {
+        e.preventDefault()
+        let { host, approveds, sents } = this.state;
         this.setState({ btnConnectText: "connecting" })
         client = new w3cwebsocket("ws://" + host)
         client.onopen = () => {
@@ -30,7 +32,21 @@ class Test extends React.Component {
 
         client.onmessage = (msg) => {
             log(msg.data)
+            if (msg.data.onApproval) {
+                console.log(msg.data.onApproval)
+                let list = approveds;
+                list.push(msg.data.onApproval)
+                this.setState({ approveds: list })
+            }
             
+            if (msg.data.onSent) {
+                console.log(msg.data.onSent)
+                let list = sents;
+                list.push(msg.data.onSent)
+                this.setState({ sents: list })
+            }
+
+
         }
 
         client.onclose = () => {
@@ -40,6 +56,7 @@ class Test extends React.Component {
     }
 
     send(e) {
+        e.preventDefault()
         let mess = JSON.stringify({
             pk: "ffffffffffffffff"
         })
@@ -61,9 +78,9 @@ class Test extends React.Component {
 
     render() {
         let { web3 } = this.props;
-        let { host, btnConnectText, isConnected } = this.state
+        let { host, btnConnectText, isConnected, approveds, sents } = this.state
         return (
-            <div className="container-fluid">
+            <div className="container">
                 <div className="row">
                     <form onSubmit={this.connect.bind(this)}>
                         <div className="row">
@@ -89,7 +106,41 @@ class Test extends React.Component {
                 <div className="row">
                     {web3 ? <Button onClick={this.do.bind(this)}>Do</Button> : ""}
                 </div>
-            </div>
+                <h3> approveds:</h3>
+                <div className="row">
+                    <div className="row">
+                        <div className="col"> owner </div> <div className="col"> spender </div>
+                    </div>
+                    {approveds.map(values => (
+                        <div className="row">
+                            <div className="col">
+                                {values.owner}
+                            </div>
+                            <div className="col">
+                                {values.spender}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+
+                <h3> sents:</h3>
+                <div className="row">
+                    <div className="row">
+                        <div className="col"> value </div> <div className="col"> hash </div>
+                    </div>
+                    {sents.map(tx => (
+                        <div className="row">
+                            <div className="col">
+                                {tx.value}
+                            </div>
+                            <div className="col">
+                                {tx.hash}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div >
         )
     }
 }
