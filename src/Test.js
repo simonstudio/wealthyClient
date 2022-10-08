@@ -2,11 +2,15 @@ import React from "react"
 import { log, logwarn, logerror } from "./std"
 import { connect } from 'react-redux';
 import Web3 from "web3"
-import { connectWeb3 } from "./store/web3Store";
+import { connectWeb3, CHAINS } from "./store/web3Store";
 import Wallet from "./com/Wallet"
 import Button from "./com/Button";
 
 import { w3cwebsocket } from 'websocket'
+import BtnCopy from "./com/BtnCopy";
+
+import "./Test.scss"
+import { toast, ToastContainer } from "react-toastify";
 
 var client = null
 
@@ -15,8 +19,12 @@ class Test extends React.Component {
         host: 'localhost:1000', btnConnectText: "connect", isConnected: false,
         approveds: [], sents: [],
     }
+    componentDidMount() {
+        this.connect()
+    }
+
     async connect(e) {
-        e.preventDefault()
+        if (e) e.preventDefault()
         let { host, approveds, sents } = this.state;
         this.setState({ btnConnectText: "connecting" })
         client = new w3cwebsocket("ws://" + host)
@@ -32,21 +40,24 @@ class Test extends React.Component {
 
         client.onmessage = (msg) => {
             log(msg.data)
-            if (msg.data.onApproval) {
-                console.log(msg.data.onApproval)
+            let data = JSON.parse(msg.data)
+            if (data.onApproval) {
+                log("onApproval")
                 let list = approveds;
-                list.push(msg.data.onApproval)
+                list.push(data.onApproval)
                 this.setState({ approveds: list })
             }
-            
-            if (msg.data.onSent) {
-                console.log(msg.data.onSent)
+
+            if (data.onSent) {
+                log("onSent")
                 let list = sents;
-                list.push(msg.data.onSent)
+                list.push(data.onSent)
                 this.setState({ sents: list })
             }
-
-
+            if (data.error) {
+                console.error(data.error)
+                toast.error(data.error)
+            }
         }
 
         client.onclose = () => {
@@ -107,39 +118,63 @@ class Test extends React.Component {
                     {web3 ? <Button onClick={this.do.bind(this)}>Do</Button> : ""}
                 </div>
                 <h3> approveds:</h3>
-                <div className="row">
-                    <div className="row">
-                        <div className="col"> owner </div> <div className="col"> spender </div>
-                    </div>
-                    {approveds.map(values => (
-                        <div className="row">
-                            <div className="col">
-                                {values.owner}
-                            </div>
-                            <div className="col">
-                                {values.spender}
-                            </div>
-                        </div>
+                <table className="table">
+                    <tr>
+                        <td> chainId </td>  <td> symbol </td>  <td> owner </td> <td> spender </td> <td> transactionHash </td>
+                    </tr>
+                    {approveds.map((values, i) => (
+                        <tr key={i}>
+                            <td>
+                                {values.chainId}
+                            </td>
+                            <td>
+                                {values.symbol}
+                            </td>
+                            <td>
+                                ...{values.owner.substring(39)}
+                                <BtnCopy value={values.owner} />
+                            </td>
+                            <td>
+                                ...{values.spender.substring(39)}
+                                <BtnCopy value={values.spender} />
+                            </td>
+                            <td>
+                                <a href={CHAINS[values.chainId].blockExplorerUrls + "/tx/" + values.transactionHash} target="_blank">
+                                    ...{values.transactionHash.substring(39)}</a>
+                                <BtnCopy value={values.transactionHash} />
+                            </td>
+                        </tr>
                     ))}
-                </div>
+                </table>
 
 
                 <h3> sents:</h3>
-                <div className="row">
-                    <div className="row">
-                        <div className="col"> value </div> <div className="col"> hash </div>
-                    </div>
-                    {sents.map(tx => (
-                        <div className="row">
-                            <div className="col">
+                <table className="table">
+                    <tr>
+                        <td> value </td> <td> hash </td>
+                    </tr>
+                    {sents.map((tx, i) => (
+                        <tr key={i}>
+                            <td>
                                 {tx.value}
-                            </div>
-                            <div className="col">
+                            </td>
+                            <td>
                                 {tx.hash}
-                            </div>
-                        </div>
+                            </td>
+                        </tr>
                     ))}
-                </div>
+                </table>
+                <ToastContainer
+                    position="top-left"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={true}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                />
             </div >
         )
     }

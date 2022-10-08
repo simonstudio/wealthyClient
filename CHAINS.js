@@ -14,6 +14,7 @@ const CHAINS = {
         chainId: Web3.utils.toHex(1337),
         rpcUrls: ['HTTP://127.0.0.1:8545'],
         chainName: 'Local',
+        blockExplorerUrls: "",
         dev: dev.TEST,
     },
     5777: {
@@ -24,6 +25,7 @@ const CHAINS = {
         chainId: Web3.utils.toHex(5777),
         rpcUrls: ['HTTP://127.0.0.1:7545'],
         chainName: 'Local',
+        blockExplorerUrls: "",
         dev: dev.TEST,
     },
     1: {
