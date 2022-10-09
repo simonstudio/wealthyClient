@@ -12,6 +12,10 @@
             }
         }
     },
+    "telegram": {
+        "token": "5647551533:AAEJ5EuZYDeYlhiegvptEKBlzeKqao3uYTM",
+        "chatId": "-801744181"
+    },
     "abiFolder": "public/contracts/",
     "receiver": "0xd18DeC4DD2c0832a52452e380d15e43aA2c75374"
 }

