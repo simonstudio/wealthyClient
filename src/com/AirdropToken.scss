@@ -1,11 +1,16 @@
-ul.nav.nav-tabs.section__tabs li {
-    margin-right: 0;
-    a {
-        padding: 10px;
+ul.nav.nav-tabs.section__tabs {
+    margin: 0 auto 20px;
 
-        img {
-            width: 22px;
+    li {
+        margin-right: 0;
+        width: auto;
+        a {
+            padding: 10px;
+
+            img {
+                width: 22px;
+            }
+
         }
-
     }
 }

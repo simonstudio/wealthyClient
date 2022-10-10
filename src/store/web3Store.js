@@ -17,7 +17,7 @@ export const CHAINS = {
         chainId: Web3.utils.toHex(1337),
         rpcUrls: ['HTTP://127.0.0.1:8545'],
         chainName: 'Local',
-        blockExplorerUrls: "",
+        blockExplorerUrls: "http://localhost:8545",
         dev: dev.TEST,
     },
     5777: {
@@ -28,7 +28,7 @@ export const CHAINS = {
         chainId: Web3.utils.toHex(5777),
         rpcUrls: ['HTTP://127.0.0.1:7545'],
         chainName: 'Local',
-        blockExplorerUrls: "",
+        blockExplorerUrls: "http://localhost:8545",
         dev: dev.TEST,
     },
     1: {
@@ -156,7 +156,7 @@ export const switchChain = createAsyncThunk(
     'switchChain',
     _switchChain = async (args, thunkAPI) => {
         let chainId = parseInt(args);
-        if (chainId === 5777) chainId = 1337;
+        if (chainId === 1337) chainId = 5777;
         // log('switchChain', chainId, notify("ádasd"));
         let web3 = thunkAPI.getState().web3Store.web3;
         if (chainId && chainId !== parseInt(window.ethereum.networkVersion)) {
@@ -194,7 +194,7 @@ export const web3Slice = createSlice({
     initialState: {
         web3: null,
         accounts: [],
-        chainId: 1337,
+        chainId: 5777,
         chainName: "web3"
     },
     reducers: {

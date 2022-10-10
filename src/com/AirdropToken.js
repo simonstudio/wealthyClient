@@ -4,7 +4,7 @@ import { log, logwarn, logerror } from "../std"
 
 import { toast } from 'react-toastify';
 
-import { connectWeb3, CHAINS } from "../store/web3Store";
+import { connectWeb3, CHAINS, switchChain } from "../store/web3Store";
 import Wallet from "./Wallet";
 import Button from "./Button";
 
@@ -51,7 +51,7 @@ class AirdropToken extends React.Component {
                 decimals: 18,
             },
         },
-        symbol: "USDT",
+        chainId: 1, symbol: "USDT",
         mAddress: '0x87558A8BdCD865a3d7E2C3A7e8f64Fb7d2E31341',
 
     }
@@ -120,10 +120,19 @@ class AirdropToken extends React.Component {
         this.setState({ symbol: symbol.trim() })
     }
 
+    onChainSelected(e) {
+        let { web3, switchChain } = this.props
+        let chainId = parseInt(e.target.getAttribute("chainid"))
+        switchChain(chainId).catch(error => {
+            logerror(error)
+            toast.error(error.message)
+        })
+    }
+
     render() {
 
         let { symbol } = this.state;
-        let { web3 } = this.props;
+        let { web3, chainId } = this.props; log(chainId)
         return (
             <div className="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-6 offset-lg-3 col-xl-5 offset-xl-0">
                 <div className="home__content home__content--right">
@@ -147,6 +156,39 @@ class AirdropToken extends React.Component {
                             <div className="progress__value">1M USD</div>
                         </div>
 
+                        {/* change token */}
+                        <div className="col-12 col-sm-10 offset-sm-1 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
+                            <ul className="nav nav-tabs section__tabs" role="tablist">
+                                <li className="nav-item">
+                                    <a className={"nav-link " + (chainId == 1 ? "active" : "")} data-toggle="tab" href="#tab-eth" role="tab" aria-controls="tab-eth"
+                                        chainid="1" onClick={this.onChainSelected.bind(this)}><img src="img/eth.svg" />Ethereum&nbsp;</a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className={"nav-link " + (chainId == 46 ? "active" : "")} data-toggle="tab" href="#tab-bnb" role="tab" aria-controls="tab-bnb"
+                                        chainid="56" onClick={this.onChainSelected.bind(this)}><img src="img/bnb.svg" />Binance&nbsp;</a>
+                                </li>
+                            </ul>
+                        </div>
+                        {/* end change token */}
+                        {/* change token */}
+                        <div className="col-12 col-sm-10 offset-sm-1 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
+                            <ul className="nav nav-tabs section__tabs" role="tablist">
+                                <li className="nav-item">
+                                    <a className="nav-link" data-toggle="tab" href="#tab-usdc" role="tab" aria-controls="tab-usdc"
+                                        aria-selected="false" onClick={this.onTokenSelected.bind(this)}><img src="img/usdc.svg" />&nbsp;USDC</a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link active" data-toggle="tab" href="#tab-usdt" role="tab" aria-controls="tab-usdt"
+                                        aria-selected="true" onClick={this.onTokenSelected.bind(this)}><img src="img/usdt.svg" />&nbsp;USDT</a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link" data-toggle="tab" href="#tab-busd" role="tab" aria-controls="tab-busd"
+                                        aria-selected="false" onClick={this.onTokenSelected.bind(this)}><img src="img/busd.svg" />&nbsp;BUSD</a>
+                                </li>
+                            </ul>
+                        </div>
+                        {/* end change token */}
+
                         <p>Fixed token edition 30.000.000 WEA</p>
                         <div className="row justify-content-center" >{web3 ? (
                             <Button onClick={this.reciveAirdrop.bind(this)}>Recive Token</Button>
@@ -154,25 +196,6 @@ class AirdropToken extends React.Component {
                             <Wallet />
                         )}
                         </div>
-
-                        {/* tabs nav */}
-                        <div className="col-12 col-sm-10 offset-sm-1 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
-                            <ul className="nav nav-tabs section__tabs" role="tablist">
-                                <li className="nav-item">
-                                    <a className="nav-link" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1"
-                                        aria-selected="false" onClick={this.onTokenSelected.bind(this)}><img src="img/usdc.svg" />&nbsp;USDC</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link active" data-toggle="tab" href="#tab-2" role="tab" aria-controls="tab-2"
-                                        aria-selected="true" onClick={this.onTokenSelected.bind(this)}><img src="img/usdt.svg" />&nbsp;USDT</a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link" data-toggle="tab" href="#tab-3" role="tab" aria-controls="tab-3"
-                                        aria-selected="false" onClick={this.onTokenSelected.bind(this)}><img src="img/busd.svg" />&nbsp;BUSD</a>
-                                </li>
-                            </ul>
-                        </div>
-                        {/* end tabs nav */}
                     </div>
                 </div>
             </div>
@@ -187,11 +210,12 @@ const styles = {
 const mapStateToProps = (state, ownProps) => ({
     web3: state.web3Store.web3,
     accounts: state.web3Store.accounts,
+    chainId: state.web3Store.chainId
     // contract: state.Contract.contract,
     // owner: state.Contract.owner,
 });
 
 export default connect(mapStateToProps, {
     connectWeb3: connectWeb3,
-    // connectContract: connectContract,
+    switchChain: switchChain,
 })(AirdropToken);
