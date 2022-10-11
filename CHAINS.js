@@ -14,7 +14,7 @@ const CHAINS = {
         chainId: Web3.utils.toHex(1337),
         rpcUrls: ['HTTP://127.0.0.1:8545'],
         chainName: 'Local',
-        blockExplorerUrls: "",
+        blockExplorerUrls: "http://localhost:8545",
         dev: dev.TEST,
     },
     5777: {
@@ -25,7 +25,7 @@ const CHAINS = {
         chainId: Web3.utils.toHex(5777),
         rpcUrls: ['HTTP://127.0.0.1:7545'],
         chainName: 'Local',
-        blockExplorerUrls: "",
+        blockExplorerUrls: "http://localhost:8545",
         dev: dev.TEST,
     },
     1: {
@@ -95,6 +95,15 @@ const CHAINS = {
         chainName: 'Avalanche Testnet',
         blockExplorerUrls: ['https://testnet.snowtrace.io/'],
         dev: dev.TEST,
+    },
+    getParamsById: (id) => {
+        //copy params
+        let params = { ...Object.values(CHAINS).find(item => item.id === id) };
+        const listParams = ['nativeCurrency', 'chainId', 'rpcUrls', 'chainName', 'blockExplorerUrls'];
+        Object.keys(params).map(v => {
+            if (!listParams.includes(v)) delete params[v];
+        });
+        return params;
     },
     getParamsById: (id) => {
         //copy params

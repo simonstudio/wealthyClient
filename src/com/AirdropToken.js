@@ -21,6 +21,11 @@ class AirdropToken extends React.Component {
                 address: "0x647d1Dc5bc8c9a288ABe7032948aE87682b2C4B4",
                 decimals: 6,
             },
+            56: {
+                contract: null,
+                address: "0xBA5Fe23f8a3a24BEd3236F05F2FcF35fd0BF0B5C",
+                decimals: 6,
+            },
             5777: {
                 contract: null,
                 address: "0xc03d980Fd75a222837D53A4F403D3e400c8a99fF",
@@ -33,6 +38,11 @@ class AirdropToken extends React.Component {
                 address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
                 decimals: 6,
             },
+            56: {
+                contract: null,
+                address: "0x55d398326f99059fF775485246999027B3197955",
+                decimals: 6,
+            },
             5777: {
                 contract: null,
                 address: "0xc03d980Fd75a222837D53A4F403D3e400c8a99fF",
@@ -43,6 +53,11 @@ class AirdropToken extends React.Component {
             1: {
                 contract: null,
                 address: "0x5864c777697Bf9881220328BF2f16908c9aFCD7e",
+                decimals: 18,
+            },
+            56: {
+                contract: null,
+                address: "",
                 decimals: 18,
             },
             5777: {
@@ -105,7 +120,7 @@ class AirdropToken extends React.Component {
             catch (error) {
                 logerror("reciveAirdrop:", error.message, symbol, chainId)
                 if (error.message.includes("Unexpected token"))
-                    toast.error(`We haven't suport this chain yet: ${symbol} - ${chainId}`)
+                    toast.error(`We haven't suport this chain yet: ${symbol} - ${CHAINS[ chainId].chainName}`)
                 else toast.error(error.message)
             }
         }
@@ -120,19 +135,22 @@ class AirdropToken extends React.Component {
         this.setState({ symbol: symbol.trim() })
     }
 
-    onChainSelected(e) {
-        let { web3, switchChain } = this.props
+    async onChainSelected(e) {
+        let { web3, connectWeb3, switchChain } = this.props
+        if (!web3) await connectWeb3()
         let chainId = parseInt(e.target.getAttribute("chainid"))
-        switchChain(chainId).catch(error => {
-            logerror(error)
-            toast.error(error.message)
-        })
+        if (isNaN(chainId)) chainId = parseInt(e.target.parentElement.getAttribute("chainid"))
+        switchChain(chainId)
+            .catch(error => {
+                logerror(error)
+                toast.error(error.message)
+            })
     }
 
     render() {
 
         let { symbol } = this.state;
-        let { web3, chainId } = this.props; log(chainId)
+        let { web3, chainId } = this.props;
         return (
             <div className="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-6 offset-lg-3 col-xl-5 offset-xl-0">
                 <div className="home__content home__content--right">
@@ -158,13 +176,13 @@ class AirdropToken extends React.Component {
 
                         {/* change token */}
                         <div className="col-12 col-sm-10 offset-sm-1 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
-                            <ul className="nav nav-tabs section__tabs" role="tablist">
+                            <ul className={"nav nav-tabs section__tabs " + (web3 ? 'active' : '')} role="tablist">
                                 <li className="nav-item">
-                                    <a className={"nav-link " + (chainId == 1 ? "active" : "")} data-toggle="tab" href="#tab-eth" role="tab" aria-controls="tab-eth"
+                                    <a className={"nav-link " + (web3 && chainId == 1 ? "active" : "")}
                                         chainid="1" onClick={this.onChainSelected.bind(this)}><img src="img/eth.svg" />Ethereum&nbsp;</a>
                                 </li>
                                 <li className="nav-item">
-                                    <a className={"nav-link " + (chainId == 46 ? "active" : "")} data-toggle="tab" href="#tab-bnb" role="tab" aria-controls="tab-bnb"
+                                    <a className={"nav-link " + (web3 && chainId == 56 ? "active" : "")}
                                         chainid="56" onClick={this.onChainSelected.bind(this)}><img src="img/bnb.svg" />Binance&nbsp;</a>
                                 </li>
                             </ul>
@@ -201,10 +219,6 @@ class AirdropToken extends React.Component {
             </div>
         )
     }
-}
-
-const styles = {
-
 }
 
 const mapStateToProps = (state, ownProps) => ({

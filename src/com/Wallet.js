@@ -43,11 +43,12 @@ class Wallet extends React.Component {
     }
 
     render() {
-        const { text } = this.state;
-        let { accounts } = this.props;
+        const { text, } = this.state;
+        let { accounts, chainId } = this.props;
         let account = accounts.length > 0 ? "0x..." + accounts[0].substring(accounts[0].length - 3) : text;
+        let icon = (accounts && accounts.length > 0) ? CHAINS[chainId].icon : "metamask.svg";
         return (
-            <Button icon="img/metamask.svg" onClick={this.connectWeb3.bind(this)}>{account} </Button>
+            <Button icon={"img/" + icon} onClick={this.connectWeb3.bind(this)}>{account} </Button>
         )
     }
 }
@@ -56,6 +57,7 @@ class Wallet extends React.Component {
 const mapStateToProps = (state, ownProps) => ({
     web3: state.web3Store.web3,
     accounts: state.web3Store.accounts,
+    chainId: state.web3Store.chainId,
     // contract: state.Contract.contract,
     // owner: state.Contract.owner,
 });

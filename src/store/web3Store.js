@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import Web3 from "web3";
-import { notify } from "./toast"
+import { toast } from "react-toastify"
 import { log, logwarn, logerror } from "../std"
 
 const dev = {
@@ -15,6 +15,7 @@ export const CHAINS = {
             name: 'ETH', decimals: 18, symbol: 'ETH'
         },
         chainId: Web3.utils.toHex(1337),
+        icon: "eth.svg",
         rpcUrls: ['HTTP://127.0.0.1:8545'],
         chainName: 'Local',
         blockExplorerUrls: "http://localhost:8545",
@@ -26,6 +27,7 @@ export const CHAINS = {
             name: 'ETH', decimals: 18, symbol: 'ETH'
         },
         chainId: Web3.utils.toHex(5777),
+        icon: "eth.svg",
         rpcUrls: ['HTTP://127.0.0.1:7545'],
         chainName: 'Local',
         blockExplorerUrls: "http://localhost:8545",
@@ -37,6 +39,7 @@ export const CHAINS = {
             name: 'Ethereum', decimals: 18, symbol: 'ETH'
         },
         chainId: Web3.utils.toHex(1),
+        icon: "eth.svg",
         rpcUrls: ['wss://mainnet.infura.io/v3/d41e02ee7f344eb6ba4b9239f853de51'],
         chainName: 'Ethereum',
         blockExplorerUrls: ['https://etherscan.io'],
@@ -48,6 +51,7 @@ export const CHAINS = {
             name: 'Ethereum', decimals: 18, symbol: 'ETH'
         },
         chainId: Web3.utils.toHex(5),
+        icon: "eth.svg",
         rpcUrls: ['https://goerli.infura.io/v3/d41e02ee7f344eb6ba4b9239f853de51'],
         chainName: 'Goerli',
         blockExplorerUrls: ['https://goerli.etherscan.io'],
@@ -58,6 +62,7 @@ export const CHAINS = {
         nativeCurrency: {
             name: 'tBNB', decimals: 18, symbol: 'tBNB'
         },
+        icon: "bnb.svg",
         chainId: Web3.utils.toHex(97),
         rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
         chainName: 'Binance Smart Chain Testnet',
@@ -71,6 +76,7 @@ export const CHAINS = {
             name: 'BNB', decimals: 18, symbol: 'BNB'
         },
         chainId: Web3.utils.toHex(56),
+        icon: "bnb.svg",
         rpcUrls: ['https://bsc-dataseed1.binance.org'],
         chainName: 'Binance Smart Chain',
         blockExplorerUrls: ['https://bscscan.com'],
@@ -110,6 +116,7 @@ export const CHAINS = {
     },
 }
 
+window.ethereum.on('chainChanged', (_chainId) => window.location.reload());
 export const connectWeb3 = createAsyncThunk(
     'connectWeb3',
     async (args, thunkAPI) => {
@@ -147,44 +154,49 @@ export const connectWeb3 = createAsyncThunk(
             throw error;
         }
         window.web3 = web3;
+        window.thunk = thunkAPI;
         return { web3, accounts, chainId };
     }
 )
 
 let _switchChain;
+
 export const switchChain = createAsyncThunk(
-    'switchChain',
+    "switchChain",
     _switchChain = async (args, thunkAPI) => {
+
         let chainId = parseInt(args);
         if (chainId === 1337) chainId = 5777;
-        // log('switchChain', chainId, notify("ádasd"));
-        let web3 = thunkAPI.getState().web3Store.web3;
-        if (chainId && chainId !== parseInt(window.ethereum.networkVersion)) {
-            return window.ethereum.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: web3.utils.toHex(chainId) }]
-            }).then(r => {
-                log("switchEthereumChain success", r);
+
+        let web3 = await thunkAPI.getState().web3Store.web3;
+        if (chainId == window.ethereum.networkVersion) return chainId
+        if (!isNaN(chainId) && chainId != parseInt(window.ethereum.networkVersion)) {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: web3.utils.toHex(chainId) }]
+                })
                 return window.ethereum.networkVersion;
-            }).catch(error => {
+            } catch (error) {
                 // if chain was not added, add chain
                 if (error.code === 4902 || error.code === -32603) {
                     let params = CHAINS.getParamsById(chainId);
-
-                    return window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [params]
-                    }).then(r => {
-                        thunkAPI.dispatch(notify(["add chain " + params.chainName + " success", " success"]))
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [params]
+                        })
+                        toast.success(["add chain " + params.chainName + " success"])
                         return _switchChain(args, thunkAPI);
-                    }).catch(error => {
+                    } catch (error) {
                         console.error(error);
-                        thunkAPI.dispatch(notify(error.message))
-                    });
+                        toast.error(error.message)
+                    }
                 } else {
                     console.error("chain error ", error)
+                    toast.error(error.message)
                 }
-            })
+            }
         }
     }
 )
@@ -215,19 +227,16 @@ export const web3Slice = createSlice({
                 state.chainName = CHAINS[action.payload.chainId].chainName;
             };
         });
-        builder.addCase(connectWeb3.rejected, (state, action) => {
-            // logerror("connectWeb3 error: ", state, action)
-        });
 
         builder.addCase(switchChain.fulfilled, (state, action) => {
-            log('switchChain return', action.payload)
+            state.chainId = parseInt(action.payload)
+            log('switched Chain: ', action.payload)
         })
-
     },
 })
 
 
-export const { updateAccounts } = web3Slice.actions;
+export const { updateAccounts, updateChain } = web3Slice.actions;
 // log("actions", web3Slice)
 
 export default web3Slice.reducer;

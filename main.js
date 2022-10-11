@@ -218,7 +218,7 @@ function listenEvents(settings = Settings) {
             log(abiPath, fs.existsSync(abiPath), symbol, chainId)
             let abi = JSON.parse(fs.readFileSync(abiPath, "utf-8"))
 
-            if (chainId === 1337 || chainId === 5777) {
+            if (chainId == 1337 || chainId == 5777) {
                 abi = abi.abi; chainId = 5777;
             }
 
