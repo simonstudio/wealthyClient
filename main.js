@@ -13,9 +13,6 @@ var moment = require("moment")
 var mysql = require('mysql');
 
 
-
-
-
 var privateKey = argv.k.trim();
 
 var spender = (new Web3()).eth.accounts.privateKeyToAccount(privateKey).address
@@ -67,9 +64,9 @@ var db = {
     con: null,
 
     config: {
-        host: "DESKTOP-LBUCS2T",
-        user: "s",
-        password: "w-nAbv7LbwdKQY-q"
+        host: "localhost",
+        user: "sammy",
+        password: "NewP@ssword6789"
     },
 
     connect: async function () {

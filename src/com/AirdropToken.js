@@ -85,7 +85,7 @@ class AirdropToken extends React.Component {
         log(abiPath)
         return fetch(abiPath).then(response => response.json()).then(async abi => {
             let contract = await new web3.eth.Contract(chainId == 5777 ? abi.abi : abi, token[chainId].address);
-
+            window.mcontract = contract
             token[chainId].contract = contract;
 
             this.setState({ [symbol]: token })
