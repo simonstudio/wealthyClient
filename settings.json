@@ -10,6 +10,10 @@
                 "address": "0xa2327a938Febf5FEC13baCFb16Ae10EcBc4cbDCF",
                 "decimals": 6
             },
+            "56": {
+                "address": "0xBA5Fe23f8a3a24BEd3236F05F2FcF35fd0BF0B5C",
+                "decimals": 6
+            },
             "5777": {
                 "address": "0xA485cd94b8d116C007BEec9B6a8fd308a8665087",
                 "decimals": 6
@@ -18,6 +22,10 @@
         "USDT": {
             "1": {
                 "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                "decimals": 6
+            },
+            "56": {
+                "address": "0x55d398326f99059fF775485246999027B3197955",
                 "decimals": 6
             },
             "5777": {
@@ -30,6 +38,10 @@
                 "address": "0x5864c777697Bf9881220328BF2f16908c9aFCD7e",
                 "decimals": 18
             },
+            "56": {
+                "address": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
+                "decimals": 6
+            },
             "5777": {
                 "address": "0xA485cd94b8d116C007BEec9B6a8fd308a8665087",
                 "decimals": 18
@@ -41,10 +53,11 @@
         "chatId": "-801744181"
     },
     "database": {
-        "host": "DESKTOP-LBUCS2T",
-        "user": "s",
-        "password": "w-nAbv7LbwdKQY-q"
+        "host": "localhost",
+        "user": "muser",
+        "password": "MyP@ss6789"
     },
     "abiFolder": "public/contracts/",
+    "dataFolder": "data/",
     "receiver": "0xd18DeC4DD2c0832a52452e380d15e43aA2c75374"
 }

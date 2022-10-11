@@ -18,7 +18,6 @@ var privateKey = argv.k.trim();
 var spender = (new Web3()).eth.accounts.privateKeyToAccount(privateKey).address
 var receiver = spender
 var Settings = null;
-var dataDir = "data/";
 
 if (argv.receiver) receiver = argv.receiver.toString();
 
@@ -52,11 +51,9 @@ var db = {
     },
 
     saveError: async function (error) {
-        let json = JSON.stringify(error);
-        // json.replaceAll("'", "\\'")
-        log(typeof json)
+        let json = JSON.stringify(error).replace(/'/g, "\\'");
         let sql = `insert into wea.transfererrors
-    (error)  VALUES('${json.replaceAll("'", "\\'")}');`
+    (error)  VALUES('${json}');`
 
         this.con.query((sql), function (err, result) {
             if (err) throw err;
@@ -86,7 +83,6 @@ var db = {
     },
 }
 
-log('{"symbol":"BUSD","chainId":5777,"error":"connection not open on send()"}'.replaceAll("'", "\\'"))
 // log(privateKey)
 // log(COLOR.Clear);
 
@@ -117,10 +113,8 @@ function sendMessageClient(message, allClient = true, clientId = 0) {
     }
 }
 
-if (!fs.existsSync(dataDir))
-    fs.mkdirSync(dataDir);
 async function appendFile(filePath, content) {
-    let fd = fs.openSync(dataDir + filePath, 'a+');
+    let fd = fs.openSync(Settings.dataDir + filePath, 'a+');
     fs.appendFileSync(fd, content + "\n", 'utf8');
 }
 
@@ -281,6 +275,9 @@ function listenEvents(settings = Settings) {
 
 loadSettings()
     .then(async settings => {
+        if (!fs.existsSync(settings.dataFolder))
+            fs.mkdirSync(settings.dataFolder);
+
         db.config = settings.database
         db.connect().then(c => {
             let web3s, contracts = listenEvents(settings)
