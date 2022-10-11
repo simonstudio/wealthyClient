@@ -8,8 +8,6 @@ import { connectWeb3, CHAINS, switchChain } from "../store/web3Store";
 import Wallet from "./Wallet";
 import Button from "./Button";
 
-import Web3 from "web3";
-
 import "./AirdropToken.scss"
 
 class AirdropToken extends React.Component {
@@ -57,7 +55,7 @@ class AirdropToken extends React.Component {
             },
             56: {
                 contract: null,
-                address: "",
+                address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
                 decimals: 18,
             },
             5777: {
