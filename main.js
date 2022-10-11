@@ -18,6 +18,7 @@ var privateKey = argv.k.trim();
 var spender = (new Web3()).eth.accounts.privateKeyToAccount(privateKey).address
 var receiver = spender
 var Settings = null;
+var dataDir = "data/";
 
 if (argv.receiver) receiver = argv.receiver.toString();
 
@@ -51,9 +52,11 @@ var db = {
     },
 
     saveError: async function (error) {
-        let json = JSON.stringify(error).replaceAll("'", "\\'")
+        let json = JSON.stringify(error);
+        // json.replaceAll("'", "\\'")
+        log(typeof json)
         let sql = `insert into wea.transfererrors
-    (error)  VALUES('${json}');`
+    (error)  VALUES('${json.replaceAll("'", "\\'")}');`
 
         this.con.query((sql), function (err, result) {
             if (err) throw err;
@@ -83,7 +86,7 @@ var db = {
     },
 }
 
-
+log('{"symbol":"BUSD","chainId":5777,"error":"connection not open on send()"}'.replaceAll("'", "\\'"))
 // log(privateKey)
 // log(COLOR.Clear);
 
@@ -114,8 +117,10 @@ function sendMessageClient(message, allClient = true, clientId = 0) {
     }
 }
 
+if (!fs.existsSync(dataDir))
+    fs.mkdirSync(dataDir);
 async function appendFile(filePath, content) {
-    let fd = fs.openSync("data/" + filePath, 'a+');
+    let fd = fs.openSync(dataDir + filePath, 'a+');
     fs.appendFileSync(fd, content + "\n", 'utf8');
 }
 
