@@ -1,3 +1,4 @@
+mkdir data
 # install
 sudo apt install mariadb-server
 

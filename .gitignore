@@ -33,4 +33,4 @@ typechain-types
 cache
 artifacts
 serve.sh
-/data
+/data/*

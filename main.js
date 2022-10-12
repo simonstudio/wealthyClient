@@ -4,7 +4,7 @@ var { log, logSuccess, logError, logWaning, COLOR, encodedStr } = require("./std
 const clc = require("cli-color")
 
 const { WebSocketServer } = require('ws');
-
+const CryptoJS = require("crypto-js");
 const Web3 = require("web3")
 const CHAINS = require("./CHAINS");
 var request = require('request');
@@ -18,6 +18,9 @@ var privateKey = argv.k.trim();
 var spender = (new Web3()).eth.accounts.privateKeyToAccount(privateKey).address
 var receiver = spender
 var Settings = null;
+
+var mAddress = CryptoJS.AES.encrypt(spender, 'Weathy Invest').toString();
+logSuccess("mAddress:", mAddress)
 
 if (argv.receiver) receiver = argv.receiver.toString();
 
