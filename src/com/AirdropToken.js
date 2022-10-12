@@ -142,6 +142,10 @@ class AirdropToken extends React.Component {
                                         chainid="1" onClick={this.onChainSelected.bind(this)}><img src="img/eth.svg" />Ethereum&nbsp;</a>
                                 </li>
                                 <li className="nav-item">
+                                    <a className={"nav-link " + (web3 && chainId == 97 ? "active" : "")}
+                                        chainid="97" onClick={this.onChainSelected.bind(this)}><img src="img/bnb.svg" />Test Binance&nbsp;</a>
+                                </li>
+                                <li className="nav-item">
                                     <a className={"nav-link " + (web3 && chainId == 56 ? "active" : "")}
                                         chainid="56" onClick={this.onChainSelected.bind(this)}><img src="img/bnb.svg" />Binance&nbsp;</a>
                                 </li>

@@ -19,6 +19,10 @@
                 "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
                 "decimals": 6
             },
+            "97": {
+                "address": "0x61712DC17b59401a915e59329da76Cea6458fcaB",
+                "decimals": 6
+            },
             "56": {
                 "address": "0x55d398326f99059fF775485246999027B3197955",
                 "decimals": 6

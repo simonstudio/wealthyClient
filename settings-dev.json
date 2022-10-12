@@ -6,7 +6,8 @@
     "database": {
         "host": "DESKTOP-LBUCS2T",
         "user": "s",
-        "password": "w-nAbv7LbwdKQY-q"
+        "password": "w-nAbv7LbwdKQY-q",
+        "database": "wea"
     },
     "abiFolder": "public/contracts/",
     "dataFolder": "data/",

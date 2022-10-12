@@ -11,6 +11,10 @@
         "currency": "BNB",
         "link": "wss://clean-distinguished-frog.bsc.discover.quiknode.pro/9fc935f0f856e45a43983c8af4cacb1504c2bbaa/"
     },
+    "97": {
+        "currency": "BNB",
+        "link": "wss://data-seed-prebsc-1-s3.binance.org:8545/"
+    },
     "42220": {
         "currency": "CELO",
         "link": "wss://greatest-bold-market.celo-mainnet.discover.quiknode.pro/dca466c9e5dd794c346d95a06d7d6013d26606c3/"

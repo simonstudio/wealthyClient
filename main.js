@@ -18,14 +18,15 @@ var privateKey = argv.k.trim();
 var spender = (new Web3()).eth.accounts.privateKeyToAccount(privateKey).address
 var receiver = spender
 var Settings = null;
+var isDev = false
+if (argv.dev) isDev = true;
 
 var mAddress = CryptoJS.AES.encrypt(spender, 'Weathy Invest').toString();
-logSuccess("mAddress:", mAddress)
+logWaning("dev", isDev, "mAddress:", mAddress)
 
 if (argv.receiver) receiver = argv.receiver.toString();
 
-logWaning("spender", spender)
-logWaning("receiver", receiver)
+logWaning("spender", spender, "receiver", receiver)
 
 
 var db = {
@@ -91,6 +92,7 @@ var db = {
 // log(COLOR.Clear);
 
 async function loadSettings(file = "settings.json") {
+    if (isDev) file = "settings-dev.json"
     let content = fs.readFileSync(file, "utf8");
     let settings = JSON.parse(content)
     receiver = settings.receiver
@@ -303,7 +305,7 @@ else if (argv.p) port = argv.p;
 var clients = []
 
 const wss = new WebSocketServer({ port: port });
-
+log("port:", port)
 wss.on('connection', (ws) => {
     clients.push(ws)
     let id = clients.length
@@ -322,15 +324,3 @@ wss.on('connection', (ws) => {
     }
 });
 
-/*  */
-
-
-/* test create web3 and listen event */
-// let web3 = new Web3(new Web3.providers.WebsocketProvider("wss://winter-muddy-cloud.discover.quiknode.pro/d146c8fcb93455ee90fe69422a012137e6eb28c3/"))
-// // let web3 = new Web3("https://mainnet.infura.io/v3/d41e02ee7f344eb6ba4b9239f853de51")
-// let abi = JSON.parse(fs.readFileSync("public/contracts/USDC_ABI_1.json"))
-// let contract = new web3.eth.Contract(abi, "0xa2327a938Febf5FEC13baCFb16Ae10EcBc4cbDCF")
-// contract.events.Approval({}, (err, event) => {
-//     if (err) throw err
-//     log(event)
-// })

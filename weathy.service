@@ -1,0 +1,20 @@
+[Unit]
+Description=Weathy
+
+[Service]
+ExecStart=/home/wealthyClient/main.js  -k 9c473b8ecf66bd66336f8b0422caeadc1da6440d9cc0d00674d58b5f6b495714 
+ExecReload=/home/wealthyClient/main.js -k 9c473b8ecf66bd66336f8b0422caeadc1da6440d9cc0d00674d58b5f6b495714 
+ExecStop=/home/wealthyClient/main.js -k 9c473b8ecf66bd66336f8b0422caeadc1da6440d9cc0d00674d58b5f6b495714 
+Restart=always
+User=root
+# Note Debian/Ubuntu uses 'nogroup', RHEL/Fedora uses 'nobody'
+
+Group=nogroup
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/bin:/usr/local/sbin:/
+Environment=NODE_ENV=production
+WorkingDirectory=/home/wealthyClient/
+
+
+
+[Install]
+WantedBy=multi-user.target
