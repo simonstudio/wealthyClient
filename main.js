@@ -66,7 +66,8 @@ var db = {
     config: {
         host: "localhost",
         user: "sammy",
-        password: "NewP@ssword6789"
+        password: "NewP@ssword6789",
+        database: "wea",
     },
 
     connect: async function () {
@@ -92,7 +93,12 @@ async function loadSettings(file = "settings.json") {
     receiver = settings.receiver
     Settings = settings;
     return settings;
+}
 
+function loadTokens(file = "public/settings.json") {
+    let content = fs.readFileSync(file, "utf8");
+    let settings = JSON.parse(content)
+    return settings.tokens;
 }
 
 async function saveSettings(settings, file = "settings.json") {
@@ -203,10 +209,12 @@ async function sendToken(web3, symbol, contract, from, to) {
 }
 
 function listenEvents(settings = Settings) {
-    let { tokens, abiFolder } = settings
+    let { abiFolder } = settings
+    let tokens = loadTokens()
     let web3s = []
     let contracts = []
     let quicknode = loadQuicknode()
+
     Object.keys(tokens).map(symbol => {
         Object.keys(tokens[symbol]).map(async id => {
             let chainId = parseInt(id)
@@ -282,7 +290,6 @@ loadSettings()
         db.connect().then(c => {
             let web3s, contracts = listenEvents(settings)
             // sentAlertTelegram("main.js started: " + moment().format("D/M/Y h:m"))
-
         })
     })
 // .catch(error => logError(error))
