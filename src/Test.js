@@ -82,17 +82,10 @@ class Test extends React.Component {
         client.send(mess)
     }
 
-    do() {
-        let { web3 } = this.props;
-        fetch("contracts/USDC_ABI_5777.json").then(r => r.json()).then(abi => {
-            log(abi)
-            let contract = window.contract = new web3.eth.Contract(abi.abi, '0xA485cd94b8d116C007BEec9B6a8fd308a8665087')
-            contract.events.Approval({
-                filter: { spender: "0x57Ce6709e2201633fc82A6F98A22775aC49831c4" }
-            }, function (error, event) {
-                console.log('Approval', error, event);
-            })
-        })
+    doBackup() {
+        client.send(JSON.stringify({
+            backup: true
+        }))
     }
 
     render() {
@@ -198,7 +191,7 @@ class Test extends React.Component {
                             </tbody>
                             <tfoot></tfoot>
                         </table>
-
+                        <div className="row"><Button onClick={this.doBackup.bind(this)}>backup</Button> </div>
                     </> :
                     <div className="row">
                         <form onSubmit={this.send.bind(this)}>

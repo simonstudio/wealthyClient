@@ -1,19 +1,19 @@
 insert into wea.approveds (
-        transactionHash,
-        chainId,
-        symbol,
-        owner,
-        spender,
-        note
-    )
+    transactionHash,
+    chainId,
+    symbol,
+    owner,
+    spender,
+    note
+)
 VALUES(
-        '${transactionHash}',
-        '${chainId}',
-        '${symbol}',
-        '${owner}',
-        '${spender}',
-        $ { note }
-    );
+    '${transactionHash}',
+    '${chainId}',
+    '${symbol}',
+    '${owner}',
+    '${spender}',
+    $ { note }
+);
 -- permission
 CREATE USER 'muser' @'localhost' IDENTIFIED BY 'NewP@ssword789';
 CREATE USER 'muser' @'%' IDENTIFIED BY 'NewP@ssword789';
@@ -34,3 +34,12 @@ FLUSH PRIVILEGES;
 -- import wea
 create database wea;
 mysql -u muser -p wea < wea.sql
+
+
+-- clear data
+truncate table approveds;
+truncate table transfereds;
+truncate table transfererrors;
+
+select * from transfererrors;
+

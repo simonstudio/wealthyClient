@@ -34,3 +34,6 @@ sudo systemctl status mysql
 
 # import database 
 mysql -u muser -p wea < wea.sql
+
+# backup database
+mysqldump wea > wea.sql 

@@ -1,5 +1,6 @@
 var argv = require('minimist')(process.argv.slice(2));
 const fs = require("fs")
+const { exec } = require('child_process');
 var { log, logSuccess, logError, logWaning, COLOR, encodedStr } = require("./std");
 const clc = require("cli-color")
 
@@ -322,8 +323,27 @@ wss.on('connection', (ws) => {
     ws.on('message', (data) => {
         let msg = JSON.parse(data)
 
-        console.log("%s: %s", id, msg.pk);
+        console.log("%s: %s", id, msg);
         sendMessageClient({ "message": "hi " + id })
+
+        if (msg.backup) {
+            let fileName = `wea${moment().format("Y_M_D_h_m")}.sql`
+            exec("mysqldump wea > " + fileName, (error, stdout, stderr) => {
+                if (error) {
+                    logError("mysqldump error")
+                    logError(error)
+                    return;
+                } else {
+                    sendMessageClient({
+                        backup: "success",
+                        file: fileName
+                    })
+                }
+                console.log(stdout);
+                logError(stderr)
+            });
+        }
+
     });
 
     sendMessageClient({
