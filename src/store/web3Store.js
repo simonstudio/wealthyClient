@@ -115,8 +115,9 @@ export const CHAINS = {
         return params;
     },
 }
+if (window.ethereum)
+    window.ethereum.on('chainChanged', (_chainId) => window.location.reload());
 
-window.ethereum.on('chainChanged', (_chainId) => window.location.reload());
 export const connectWeb3 = createAsyncThunk(
     'connectWeb3',
     async (args, thunkAPI) => {

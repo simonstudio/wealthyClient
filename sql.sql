@@ -17,10 +17,8 @@ VALUES(
 -- permission
 CREATE USER 'muser' @'localhost' IDENTIFIED BY 'NewP@ssword789';
 CREATE USER 'muser' @'%' IDENTIFIED BY 'NewP@ssword789';
-GRANT ALL PRIVILEGES ON *.* TO 'muser' @'localhost' IDENTIFIED BY 'PASSWORD' WITH
-GRANT OPTION;
-GRANT ALL PRIVILEGES ON *.* TO 'muser' @'%' IDENTIFIED BY 'PASSWORD' WITH
-GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'muser' @'localhost' IDENTIFIED BY 'PASSWORD' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'muser' @'%' IDENTIFIED BY 'PASSWORD' WITH GRANT OPTION;
 
 GRANT ALL ON wea.* TO muser@'localhost' IDENTIFIED BY 'NewP@ssword789';
 GRANT ALL ON wea.* TO muser@'%' IDENTIFIED BY 'NewP@ssword789';
@@ -37,3 +35,7 @@ from mysql.user;
 -- change password
 ALTER USER 'muser' @'%' IDENTIFIED BY 'NEW_USER_PASSWORD';
 FLUSH PRIVILEGES;
+
+-- import wea
+create database wea;
+mysql -u muser -p wea < wea.sql

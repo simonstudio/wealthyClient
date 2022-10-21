@@ -570,7 +570,7 @@ class App extends React.Component {
                     <h3>Santiago Robinson</h3>
                     <span>GP & LP Investor</span>
                   </div>
-                  <img src="img/team/member.png" alt="" className="team__img" />
+                  <img src="img/team/member.jpg" alt="" className="team__img" />
                   <ul className="team__social">
                     <li>
                       <a href="#" className="ld">
@@ -604,7 +604,7 @@ class App extends React.Component {
                     <h3>Tony Young</h3>
                     <span>Business developer</span>
                   </div>
-                  <img src="img/team/member4.png" alt="" className="team__img" />
+                  <img src="img/team/member4.jpg" alt="" className="team__img" />
                   <ul className="team__social">
                     <li>
                       <a href="#" className="ld">
@@ -638,7 +638,7 @@ class App extends React.Component {
                     <h3>Marsha Lee</h3>
                     <span>Community manager</span>
                   </div>
-                  <img src="img/team/member5.png" alt="" className="team__img" />
+                  <img src="img/team/member5.jpg" alt="" className="team__img" />
                   <ul className="team__social">
                     <li>
                       <a href="#" className="ld">
@@ -690,7 +690,7 @@ class App extends React.Component {
                     <h3>Roland Samuel</h3>
                     <span>CEO</span>
                   </div>
-                  <img src="img/team/member6.png" alt="" className="team__img" />
+                  <img src="img/team/member6.jpg" alt="" className="team__img" />
                   <ul className="team__social">
                     <li>
                       <a href="#" className="ld">
@@ -724,7 +724,7 @@ class App extends React.Component {
                     <h3>David Drake</h3>
                     <span>Head of marketing</span>
                   </div>
-                  <img src="img/team/member3.png" alt="" className="team__img" />
+                  <img src="img/team/member3.jpg" alt="" className="team__img" />
                   <ul className="team__social">
                     <li>
                       <a href="#" className="ld">
@@ -758,7 +758,7 @@ class App extends React.Component {
                     <h3>Sandra Pen</h3>
                     <span>App developer</span>
                   </div>
-                  <img src="img/team/member7.png" alt="" className="team__img" />
+                  <img src="img/team/member7.jpg" alt="" className="team__img" />
                   <ul className="team__social">
                     <li>
                       <a href="#" className="ld">
@@ -792,7 +792,7 @@ class App extends React.Component {
                     <h3>John Smith</h3>
                     <span>Manager</span>
                   </div>
-                  <img src="img/team/member2.png" alt="" className="team__img" />
+                  <img src="img/team/member2.jpg" alt="" className="team__img" />
                   <ul className="team__social">
                     <li>
                       <a href="#" className="ld">

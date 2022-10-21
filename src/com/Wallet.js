@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import Button from "./Button"
 import { log, logwarn, logerror } from "../std"
 
-import Signin from "../Signin";
 import { toast } from 'react-toastify';
 
 import { connectWeb3, CHAINS } from "../store/web3Store";
@@ -21,7 +20,9 @@ class Wallet extends React.Component {
 
     connectWeb3() {
         if (!window.ethereum || !window.ethereum.isMetaMask) {
-            toast.error(<>Please install <a href='https://metamask.io/' target="_blank">Metamask</a></>);
+            let url = 'https://metamask.io/';
+            toast.error(<>Please install <a href={url} target="_blank">Metamask</a></>);
+            window.open(url, '_blank').focus();
             this.setState({ text: "Install" })
         } else {
             let { web3 } = this.props;

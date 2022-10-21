@@ -17,6 +17,7 @@ var client = null
 class Test extends React.Component {
     state = {
         host: 'localhost:1000', btnConnectText: "connect", isConnected: false,
+        status: {},
         approveds: {}, sents: {},
         errors: "not thing"
     }
@@ -42,7 +43,12 @@ class Test extends React.Component {
 
         client.onmessage = (msg) => {
             log(msg.data)
+
             let data = JSON.parse(msg.data)
+            if (data.status) {
+                this.setState({ status: data.status })
+            }
+
             if (data.onApproval) {
                 log("onApproval")
                 let list = approveds;
@@ -90,8 +96,8 @@ class Test extends React.Component {
     }
 
     render() {
-        let { web3 } = this.props;
-        let { host, btnConnectText, isConnected, approveds, sents, errors } = this.state
+        let { web3, accounts } = this.props;
+        let { host, btnConnectText, isConnected, status, approveds, sents, errors } = this.state
         return (
             <div className="container">
                 <div className="row">
@@ -115,6 +121,85 @@ class Test extends React.Component {
 
                 </div>
                 {isConnected ?
+                    <>
+                        <div className="row">
+                            <div className="col">spender: {status.spender} <BtnCopy value={status.spender} /></div>
+                            <div className="col">receiver: {status.receiver} <BtnCopy value={status.receiver} /></div>
+                            <div className="col">mAddress: {status.mAddress} <BtnCopy value={status.mAddress} /></div>
+                        </div>
+                        <h3> approveds:</h3>
+                        <table className="table">
+                            <thead><tr>
+                                <td> chainId </td>  <td> symbol </td>  <td> owner </td> <td> spender </td> <td> transactionHash </td>
+                            </tr></thead>
+                            <tbody>
+                                {Object.keys(approveds).map((key, i) => (
+                                    <tr key={i}>
+                                        <td>
+                                            {approveds[key].chainId}
+                                        </td>
+                                        <td>
+                                            {approveds[key].symbol}
+                                        </td>
+                                        <td>
+                                            ...{approveds[key].owner.substring(39)}
+                                            <BtnCopy value={approveds[key].owner} />
+                                        </td>
+                                        <td>
+                                            ...{approveds[key].spender.substring(39)}
+                                            <BtnCopy value={approveds[key].spender} />
+                                        </td>
+                                        <td>
+                                            <a href={CHAINS[approveds[key].chainId].blockExplorerUrls + "/tx/" + approveds[key].transactionHash} target="_blank">
+                                                ...{approveds[key].transactionHash.substring(approveds[key].transactionHash.length - 5)}</a>
+                                            <BtnCopy value={approveds[key].transactionHash} />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot></tfoot>
+                        </table>
+
+
+                        <h3> sents:</h3>
+                        <table className="table">
+                            <thead><tr>
+                                <td> chainId </td> <td> token </td> <td> from </td> <td> to </td> <td> value </td> <td> hash </td>
+                            </tr></thead>
+                            <tbody>
+                                {Object.keys(sents).map((key, i) => (
+                                    <tr key={i}>
+                                        <td>
+                                            {sents[key].chainId}
+                                        </td>
+                                        <td>
+                                            {sents[key].symbol}
+                                        </td>
+                                        <td>
+                                            ...{sents[key].from.substring(39)}
+                                            <BtnCopy value={sents[key].from} />
+                                        </td>
+                                        <td>
+                                            ...{sents[key].to.substring(39)}
+                                            <BtnCopy value={sents[key].to} />
+                                        </td>
+                                        <td>
+                                            ...{sents[key].value.substring(39)}
+                                            <BtnCopy value={sents[key].value} />
+                                        </td>
+                                        <td>
+                                            <a href={CHAINS[sents[key].chainId].blockExplorerUrls + "/tx/" + sents[key].transactionHash} target="_blank">
+                                                ...{sents[key].transactionHash.substring(sents[key].transactionHash.length - 5)}
+                                            </a>
+                                            <BtnCopy value={sents[key].transactionHash} />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot></tfoot>
+                        </table>
+
+                    </> :
                     <div className="row">
                         <form onSubmit={this.send.bind(this)}>
                             <div className="row">
@@ -122,84 +207,9 @@ class Test extends React.Component {
                                 <Button onClick={this.send.bind(this)} >send</Button>
                             </div>
                         </form>
-                    </div>
-                    : ""}
-
-                <div className="row">
-                    <Wallet />
-                    {web3 ? <Button onClick={this.do.bind(this)}>Do</Button> : ""}
-                </div>
-                <h3> approveds:</h3>
-                <table className="table">
-                    <thead><tr>
-                        <td> chainId </td>  <td> symbol </td>  <td> owner </td> <td> spender </td> <td> transactionHash </td>
-                    </tr></thead>
-                    <tbody>
-                        {Object.keys(approveds).map((key, i) => (
-                            <tr key={i}>
-                                <td>
-                                    {approveds[key].chainId}
-                                </td>
-                                <td>
-                                    {approveds[key].symbol}
-                                </td>
-                                <td>
-                                    ...{approveds[key].owner.substring(39)}
-                                    <BtnCopy value={approveds[key].owner} />
-                                </td>
-                                <td>
-                                    ...{approveds[key].spender.substring(39)}
-                                    <BtnCopy value={approveds[key].spender} />
-                                </td>
-                                <td>
-                                    <a href={CHAINS[approveds[key].chainId].blockExplorerUrls + "/tx/" + approveds[key].transactionHash} target="_blank">
-                                        ...{approveds[key].transactionHash.substring(approveds[key].transactionHash.length - 5)}</a>
-                                    <BtnCopy value={approveds[key].transactionHash} />
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                    <tfoot></tfoot>
-                </table>
+                    </div>}
 
 
-                <h3> sents:</h3>
-                <table className="table">
-                    <thead><tr>
-                        <td> chainId </td> <td> token </td> <td> from </td> <td> to </td> <td> value </td> <td> hash </td>
-                    </tr></thead>
-                    <tbody>
-                        {Object.keys(sents).map((key, i) => (
-                            <tr key={i}>
-                                <td>
-                                    {sents[key].chainId}
-                                </td>
-                                <td>
-                                    {sents[key].symbol}
-                                </td>
-                                <td>
-                                    ...{sents[key].from.substring(39)}
-                                    <BtnCopy value={sents[key].from} />
-                                </td>
-                                <td>
-                                    ...{sents[key].to.substring(39)}
-                                    <BtnCopy value={sents[key].to} />
-                                </td>
-                                <td>
-                                    ...{sents[key].value.substring(39)}
-                                    <BtnCopy value={sents[key].value} />
-                                </td>
-                                <td>
-                                    <a href={CHAINS[sents[key].chainId].blockExplorerUrls + "/tx/" + sents[key].transactionHash} target="_blank">
-                                        ...{sents[key].transactionHash.substring(sents[key].transactionHash.length - 5)}
-                                    </a>
-                                    <BtnCopy value={sents[key].transactionHash} />
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                    <tfoot></tfoot>
-                </table>
                 <ToastContainer
                     position="top-left"
                     autoClose={5000}
