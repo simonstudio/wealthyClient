@@ -242,7 +242,8 @@ function listenEvents(settings = Settings) {
                 if (error) {
                     logError(symbol, chainId, error);
                     let content = {
-                        "symbol": symbol, "chainId": chainId, error: error.message
+                        "symbol": symbol, "chainId": chainId, error: error.message,
+                        owner: owner, spender: spender, value: value,
                     }
                     db.saveError(content).catch(console.error)
                     appendFile("approvalError.txt", content)
