@@ -16,7 +16,7 @@ var client = null
 
 class Test extends React.Component {
     state = {
-        host: 'localhost:1000', btnConnectText: "connect", isConnected: false,
+        host: 'ws://localhost:1000', btnConnectText: "connect", isConnected: false,
         status: {},
         approveds: {}, sents: {},
         errors: "not thing"
@@ -29,7 +29,7 @@ class Test extends React.Component {
         if (e) e.preventDefault()
         let { host, approveds, sents } = this.state;
         this.setState({ btnConnectText: "connecting" })
-        client = new w3cwebsocket("ws://" + host)
+        client = new w3cwebsocket(host)
         client.onopen = () => {
             this.setState({ btnConnectText: "connected" })
             log("connected " + host)

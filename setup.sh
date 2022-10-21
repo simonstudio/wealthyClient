@@ -24,7 +24,9 @@ sudo ufw allow 1000/tcp
 sudo apt install php libapache2-mod-php php-gd php-mysql
 # public database
 sudo iptables -A INPUT -p tcp --destination-port 3306 -j ACCEPT
+sudo iptables -A INPUT -p tcp --destination-port 3001 -j ACCEPT
 sudo ufw allow 3306/tcp
+sudo ufw allow 3001/tcp
 
 # start service
 sudo systemctl start mysql

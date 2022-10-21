@@ -32,6 +32,9 @@ typechain-types
 #Hardhat files
 cache
 artifacts
+
+#settings
+
 serve.sh
 /data/*
 readCookie.js

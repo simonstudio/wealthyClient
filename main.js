@@ -93,6 +93,7 @@ async function loadSettings(file = "settings.json") {
 }
 
 function loadTokens(file = "public/settings.json") {
+    if (isDev) file = "public/settings-dev.json";
     let content = fs.readFileSync(file, "utf8");
     let settings = JSON.parse(content)
     return settings.tokens;
@@ -236,6 +237,7 @@ function listenEvents(settings = Settings) {
             web3.eth.accounts.wallet.add(privateKey)
 
             let contract = new web3.eth.Contract(abi, tokens[symbol][chainId].address)
+            if (chainId == 5) test(contract)
             contract.events.Approval({ filter: { "spender": spender } }, (error, event) => {
                 if (error) {
                     logError(symbol, chainId, error);
@@ -277,6 +279,15 @@ function listenEvents(settings = Settings) {
     return web3s, contracts;
 }
 
+async function test(contract) {
+    contract.events.Approval({}, (error, event) => {
+        if (error) {
+            logError(error)
+        } else {
+            console.log(event.returnValues)
+        }
+    })
+}
 
 loadSettings()
     .then(async settings => {

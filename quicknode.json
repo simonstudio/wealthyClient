@@ -7,6 +7,10 @@
         "currency": "ETH",
         "link": "ws://127.0.0.1:7545"
     },
+    "5": {
+        "currency": "ETH",
+        "link": "wss://little-attentive-dawn.ethereum-goerli.discover.quiknode.pro/4dcad63a6e0d26cbd84576d05c06ee1f435a2320/"
+    },
     "56": {
         "currency": "BNB",
         "link": "wss://clean-distinguished-frog.bsc.discover.quiknode.pro/9fc935f0f856e45a43983c8af4cacb1504c2bbaa/"

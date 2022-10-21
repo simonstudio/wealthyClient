@@ -22,15 +22,10 @@ GRANT ALL PRIVILEGES ON *.* TO 'muser' @'%' IDENTIFIED BY 'PASSWORD' WITH GRANT 
 
 GRANT ALL ON wea.* TO muser@'localhost' IDENTIFIED BY 'NewP@ssword789';
 GRANT ALL ON wea.* TO muser@'%' IDENTIFIED BY 'NewP@ssword789';
+GRANT ALL ON wea.* TO muser@'155.138.244.125' IDENTIFIED BY 'NewP@ssword789';
 
 -- check users
-select host,
-    user,
-    password,
-    max_connections,
-    max_user_connections,
-    Grant_priv
-from mysql.user;
+select host, user, password, max_connections, max_user_connections, Grant_priv from mysql.user;
 -- GRANT ALL PRIVILEGES ON `wea`.* TO 's' @'localhost';
 -- change password
 ALTER USER 'muser' @'%' IDENTIFIED BY 'NEW_USER_PASSWORD';

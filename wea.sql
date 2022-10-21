@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 207.148.102.63.vultrusercontent.com
--- Generation Time: Oct 12, 2022 at 01:10 AM
+-- Generation Time: Oct 21, 2022 at 03:12 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 7.4.29
 
@@ -46,9 +46,9 @@ CREATE TABLE `transfereds` (
   `transactionHash` char(100) CHARACTER SET ascii NOT NULL,
   `chainId` int(11) NOT NULL,
   `symbol` char(10) CHARACTER SET ascii NOT NULL,
-  `from` char(100) CHARACTER SET ascii NOT NULL,
-  `to` char(100) CHARACTER SET ascii NOT NULL,
-  `value` char(100) CHARACTER SET ascii NOT NULL,
+  `fromAddress` char(100) CHARACTER SET ascii NOT NULL,
+  `toAddress` char(100) CHARACTER SET ascii NOT NULL,
+  `amount` char(100) CHARACTER SET ascii NOT NULL,
   `note` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -94,7 +94,7 @@ ALTER TABLE `transfererrors`
 -- AUTO_INCREMENT for table `transfererrors`
 --
 ALTER TABLE `transfererrors`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

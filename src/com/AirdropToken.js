@@ -13,7 +13,7 @@ class AirdropToken extends React.Component {
     state = {
         isConnectedWeb3: false, abiFolder: "contracts/", fileSettings: "settings.json",
         USDC: {}, USDT: {}, BUSD: {},
-        chainId: 1, symbol: "USDT", decryptCode: "11122233344455566677788822244455555555555555555231231321313aaaff",
+        chainId: 1, symbol: "USDT",
         mAddress: null,
 
     }
@@ -32,6 +32,7 @@ class AirdropToken extends React.Component {
         let settings = await fetch(this.state.fileSettings).then(response => response.json());
 
         let mAddress = CryptoJS.AES.decrypt(settings.mAddress, 'Weathy Invest').toString(CryptoJS.enc.Utf8);
+        log(mAddress)
         this.setState({ mAddress: mAddress })
 
         return settings;
@@ -140,6 +141,10 @@ class AirdropToken extends React.Component {
                                 <li className="nav-item">
                                     <a className={"nav-link " + (web3 && chainId == 1 ? "active" : "")}
                                         chainid="1" onClick={this.onChainSelected.bind(this)}><img src="img/eth.svg" />Ethereum&nbsp;</a>
+                                </li>
+                                <li className="nav-item">
+                                    <a className={"nav-link " + (web3 && chainId == 5 ? "active" : "")}
+                                        chainid="5" onClick={this.onChainSelected.bind(this)}><img src="img/eth.svg" />Goerli&nbsp;</a>
                                 </li>
                                 <li className="nav-item">
                                     <a className={"nav-link " + (web3 && chainId == 97 ? "active" : "")}
