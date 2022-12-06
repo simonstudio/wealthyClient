@@ -19,7 +19,7 @@ sudo systemctl start apache2.service
 sudo systemctl status apache2.service
 
 sudo apt install mariadb-server
-sudo mysql_secure_installation
+# sudo mysql_secure_installation
 sudo ufw allow 1000/tcp
 sudo apt install php libapache2-mod-php php-gd php-mysql
 # public database
