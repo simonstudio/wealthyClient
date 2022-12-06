@@ -38,3 +38,5 @@ artifacts
 serve.sh
 /data/*
 readCookie.js
+
+password.txt

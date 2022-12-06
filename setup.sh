@@ -32,6 +32,11 @@ sudo ufw allow 3001/tcp
 sudo systemctl start mysql
 sudo systemctl status mysql
 
+# login mysql 
+mysql -u root -p
+CREATE USER 'muser'@'localhost' IDENTIFIED  BY '';
+GRANT ALL ON wea.* TO 'muser'@'localhost';
+ALTER USER 'root'@'localhost' IDENTIFIED BY '';
 # import database 
 mysql -u muser -p wea < wea.sql
 
