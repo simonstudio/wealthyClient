@@ -1,15 +1,15 @@
 var argv = require('minimist')(process.argv.slice(2));
-const fs = require("fs")
+const fs = require("fs");
 const { exec } = require('child_process');
 var { log, logSuccess, logError, logWaning, COLOR, encodedStr } = require("./std");
-const clc = require("cli-color")
+const clc = require("cli-color");
 
 const { WebSocketServer } = require('ws');
 const CryptoJS = require("crypto-js");
-const Web3 = require("web3")
+const Web3 = require("web3");
 const CHAINS = require("./CHAINS");
 var request = require('request');
-var moment = require("moment")
+var moment = require("moment");
 
 var mysql = require('mysql');
 
@@ -60,20 +60,24 @@ var db = {
 
     config: {
         host: "localhost",
-        user: "sammy",
-        password: "NewP@ssword6789",
+        user: "muser",
+        password: "Muser#sd5@5",
         database: "wea",
     },
 
     connect: async function () {
         return new Promise((rs, rj) => {
             let connection = mysql.createConnection(this.config);
-
+            console.log(this.config)
             connection.connect((err) => {
-                if (err) rj(err)
-                console.log('connected db as id ' + connection.threadId);
-                this.con = connection;
-                rs(connection);
+                if (err) {
+                    logError(err)
+                    rj(err)
+                } else {
+                    console.log('connected db as id ' + connection.threadId);
+                    this.con = connection;
+                    rs(connection);
+                }
             });
         })
     },

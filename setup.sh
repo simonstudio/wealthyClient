@@ -26,19 +26,22 @@ sudo apt install php libapache2-mod-php php-gd php-mysql
 sudo iptables -A INPUT -p tcp --destination-port 3306 -j ACCEPT
 sudo iptables -A INPUT -p tcp --destination-port 3001 -j ACCEPT
 sudo ufw allow 3306/tcp
+sudo ufw allow 3000/tcp
 sudo ufw allow 3001/tcp
 
 # start service
 sudo systemctl start mysql
 sudo systemctl status mysql
 
-# login mysql 
+# login mysql
 mysql -u root -p
-CREATE USER 'muser'@'localhost' IDENTIFIED  BY '';
+CREATE USER 'muser'@'localhost' IDENTIFIED  BY 'Muser#sd5@5';
 GRANT ALL ON wea.* TO 'muser'@'localhost';
-ALTER USER 'root'@'localhost' IDENTIFIED BY '';
-# import database 
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'Muser#sd5@5';
+# import database
 mysql -u muser -p wea < wea.sql
 
 # backup database
 mysqldump wea > wea.sql 
+
+

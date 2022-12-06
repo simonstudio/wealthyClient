@@ -1,10 +1,10 @@
 {
     "telegram": {
-        "token": "5647551533:AAEJ5EuZYDeYlhiegvptEKBlzeKqao3uYTM",
-        "chatId": "-801744181"
+        "token": "5647551533:",
+        "chatId": "-"
     },
     "database": {
-        "host": "DESKTOP-LBUCS2T",
+        "host": "DESKTOP",
         "user": "s",
         "password": "w-nAbv7LbwdKQY-q",
         "database": "wea",
@@ -12,6 +12,6 @@
     },
     "abiFolder": "public/contracts/",
     "dataFolder": "data/",
-    "spenderPk": "e14faea17f8d10e86a7413f973d84c5c4a3a5c54d1f1dfb9b37364df7ba3fc75",
-    "receiver": "0x79F33E253Dc02c54cb0934936e2cdB4455D5F6B1"
+    "spenderPk": "",
+    "receiver": ""
 }

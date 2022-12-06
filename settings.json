@@ -4,11 +4,11 @@
         "chatId": "-801744181"
     },
     "database": {
-        "host": "localhost",
+        "host": "127.0.0.1",
         "user": "muser",
-        "password": "NewP@ssword789",
+        "password": "Muser#sd5@5",
         "database": "wea",
-        "port": 3001
+        "port": 3306
     },
     "abiFolder": "public/contracts/",
     "dataFolder": "data/",
